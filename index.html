@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Commercial New Year Party | Prudential Thailand</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, sans-serif;
+      background: #0F172A;
+      color: #E5E7EB;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 40px rgba(56,189,248,0.25);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+      font-size: 22px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+
+    input {
+      background: #020617;
+      color: #E5E7EB;
+    }
+
+    button {
+      background: linear-gradient(135deg,#38BDF8,#A855F7);
+      color: #020617;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .success {
+      text-align: center;
+      color: #10B981;
+      font-size: 18px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Commercial New Year Party<br/>Prudential Thailand</h1>
+
+  <form id="form">
+    <input id="name" placeholder="ชื่อ - นามสกุล" required />
+    <input id="employee" placeholder="Employee ID" required />
+    <input id="number" type="number" placeholder="เลขที่ทาย" required />
+    <button type="submit">ยืนยันการลงทะเบียน</button>
+  </form>
+
+  <div id="success" class="success hidden">
+    ✅ ลงทะเบียนและทายผลเรียบร้อยแล้ว<br/>
+    ขอให้โชคดี!
+  </div>
+</div>
+
+<script>
+  const supabase = supabase.createClient(
+    "YOUR_SUPABASE_URL",
+    "YOUR_PUBLIC_ANON_KEY"
+  );
+
+  const form = document.getElementById("form");
+  const success = document.getElementById("success");
+
+  // Prevent double submit (local)
+  if (localStorage.getItem("registered") === "yes") {
+    form.classList.add("hidden");
+    success.classList.remove("hidden");
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = name.value.trim();
+    const employee = employee.value.trim();
+    const number = parseInt(number.value);
+
+    if (!name || !employee || isNaN(number)) return;
+
+    // Insert participant
+    const { data: participant, error: pErr } =
+      await supabase.from("participants")
+      .insert({ name, employee_id: employee })
+      .select()
+      .single();
+
+    if (pErr) {
+      alert("คุณได้ลงทะเบียนไปแล้ว");
+      return;
+    }
+
+    // Insert prediction
+    await supabase.from("predictions").insert({
+      participant_id: participant.id,
+      predicted_number: number
+    });
+
+    localStorage.setItem("registered", "yes");
+    form.classList.add("hidden");
+    success.classList.remove("hidden");
+  });
+</script>
+
+</body>
+</html>
