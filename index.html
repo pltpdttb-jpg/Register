@@ -1,137 +1,218 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Commercial New Year Party | Prudential Thailand</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ลงทะเบียนทายผล | Prudential NY Party</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap');
+        body { font-family: 'Kanit', sans-serif; background: #0f0f13; color: white; min-height: 100vh; overflow-x: hidden; }
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        .lotto-paper {
+            background: #fff;
+            color: #000;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            background-image: radial-gradient(#eee 1.5px, transparent 1.5px);
+            background-size: 15px 15px;
+        }
+        .lotto-border { border: 2px solid #000; padding: 2px; }
+        
+        .custom-input { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: white; 
+            transition: all 0.3s;
+        }
+        .custom-input:focus {
+            border-color: #ED1B2E;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        .lotto-digit-input { 
+            background: #f8f8f8; 
+            border: 2px solid #333; 
+            font-size: 3.5rem; 
+            letter-spacing: 0.5rem; 
+            font-weight: 800;
+            text-align: center;
+            border-radius: 12px;
+            color: #000;
+        }
+        .lotto-digit-input:focus {
+            border-color: #ED1B2E;
+            background: #fff;
+            outline: none;
+        }
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Inter, sans-serif;
-      background: #0F172A;
-      color: #E5E7EB;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .card {
-      width: 100%;
-      max-width: 420px;
-      padding: 32px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 40px rgba(56,189,248,0.25);
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 24px;
-      font-size: 22px;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 14px;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-    }
-
-    input {
-      background: #020617;
-      color: #E5E7EB;
-    }
-
-    button {
-      background: linear-gradient(135deg,#38BDF8,#A855F7);
-      color: #020617;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .success {
-      text-align: center;
-      color: #10B981;
-      font-size: 18px;
-    }
-
-    .hidden {
-      display: none;
-    }
-  </style>
+        .btn-red { 
+            background: linear-gradient(135deg, #ED1B2E 0%, #B00000 100%); 
+            box-shadow: 0 4px 15px rgba(237, 27, 46, 0.4);
+        }
+        
+        .label-text {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+    </style>
 </head>
-<body>
+<body class="flex items-center justify-center p-4">
 
-<div class="card">
-  <h1>Commercial New Year Party<br/>Prudential Thailand</h1>
+    <div class="w-full max-w-md relative">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold">Commercial New Year 2024</h1>
+            <p class="text-red-500 text-xs tracking-widest uppercase font-bold">Prudential Thailand</p>
+        </div>
 
-  <form id="form">
-    <input id="name" placeholder="ชื่อ - นามสกุล" required />
-    <input id="employee" placeholder="Employee ID" required />
-    <input id="number" type="number" placeholder="เลขที่ทาย" required />
-    <button type="submit">ยืนยันการลงทะเบียน</button>
-  </form>
+        <!-- Single Page Form -->
+        <div id="main-form" class="glass-card rounded-3xl p-6 shadow-2xl">
+            <h2 class="text-xl font-bold mb-6 text-center text-red-500 uppercase tracking-tight">
+                ร่วมทายผลฉลากกินไม่แบ่ง (ยอดขาย 2025)
+            </h2>
+            
+            <form id="prediction-form" class="space-y-5">
+                <!-- ข้อมูลส่วนตัว -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="label-text">ชื่อ-นามสกุล</label>
+                        <input type="text" id="reg-name" required class="custom-input w-full rounded-xl px-4 py-3" placeholder="ระบุชื่อ-นามสกุล">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="label-text">ชื่อเล่น</label>
+                            <input type="text" id="reg-nickname" required class="custom-input w-full rounded-xl px-4 py-3" placeholder="ชื่อเล่น">
+                        </div>
+                        <div>
+                            <label class="label-text">แผนก</label>
+                            <input type="text" id="reg-dept" required class="custom-input w-full rounded-xl px-4 py-3" placeholder="ระบุแผนก">
+                        </div>
+                    </div>
 
-  <div id="success" class="success hidden">
-    ✅ ลงทะเบียนและทายผลเรียบร้อยแล้ว<br/>
-    ขอให้โชคดี!
-  </div>
-</div>
+                    <div>
+                        <label class="label-text">รหัสพนักงาน</label>
+                        <input type="text" id="reg-emp-id" required class="custom-input w-full rounded-xl px-4 py-3" placeholder="Employee ID">
+                    </div>
+                </div>
 
-<script>
-  const supabase = supabase.createClient(
-    "YOUR_SUPABASE_URL",
-    "YOUR_PUBLIC_ANON_KEY"
-  );
+                <!-- พื้นที่ทายเลข (Lotto Style) -->
+                <div class="lotto-paper p-3 text-black mt-6">
+                    <div class="lotto-border flex flex-col items-center p-3 border-2 border-double border-blue-900">
+                        <div class="w-full flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-bold border border-black px-1">2025</span>
+                            <div class="text-center">
+                                <p class="text-[10px] font-bold leading-none">ฉลากกินไม่แบ่ง ไม่ใช่ของรัฐบาล</p>
+                                <p class="text-[14px] font-black text-blue-900 leading-tight">งวดประจำปี 2025</p>
+                            </div>
+                            <span class="text-[10px] font-bold border border-black px-1 font-mono">№ 0001</span>
+                        </div>
 
-  const form = document.getElementById("form");
-  const success = document.getElementById("success");
+                        <div class="w-full my-4">
+                            <input type="number" id="lotto-num" required class="lotto-digit-input w-full" placeholder="00000" oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);">
+                            <p class="text-[10px] text-center mt-2 font-bold text-red-600">กรอกเลขนำโชค 5 หลักเพื่อชิงรางวัล</p>
+                        </div>
 
-  // Prevent double submit (local)
-  if (localStorage.getItem("registered") === "yes") {
-    form.classList.add("hidden");
-    success.classList.remove("hidden");
-  }
+                        <div class="w-full border-t border-black pt-2 flex justify-end">
+                            <div class="bg-red-600 text-white px-2 py-0.5 text-[10px] font-bold transform -rotate-1">
+                                PRUDENTIAL THAILAND
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+                <button type="submit" id="submit-btn" class="btn-red w-full py-4 rounded-2xl font-bold text-xl mt-4 shadow-xl active:scale-95 transition-all">
+                    ส่งข้อมูลและทายผล <i class="fa-solid fa-paper-plane ml-2"></i>
+                </button>
+            </form>
+        </div>
 
-    const name = name.value.trim();
-    const employee = employee.value.trim();
-    const number = parseInt(number.value);
+        <!-- SUCCESS BOX -->
+        <div id="success-box" class="hidden glass-card rounded-3xl p-10 text-center border-2 border-green-500/30">
+            <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/20">
+                <i class="fa-solid fa-camera text-4xl text-white"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">ส่งฉลากสำเร็จ!</h2>
+            
+            <div class="bg-red-500/20 border border-red-500/50 rounded-2xl p-5 mb-6">
+                <p class="text-red-500 font-bold text-lg animate-pulse">
+                    ⚠️ สำคัญมาก: กรุณาแคปหน้าจอ<br>เพื่อยืนยันตอนรับรางวัล ⚠️
+                </p>
+                <div class="mt-3 text-white">
+                    <p class="text-xs text-gray-400 uppercase">เลขที่ท่านทายคือ</p>
+                    <p id="final-lotto-display" class="text-4xl font-black tracking-widest text-yellow-400">00000</p>
+                </div>
+            </div>
+            
+            <button onclick="location.reload()" class="text-gray-500 text-sm underline hover:text-white transition-colors">
+                กลับไปหน้าลงทะเบียน
+            </button>
+        </div>
+    </div>
 
-    if (!name || !employee || isNaN(number)) return;
+    <script>
+        // Supabase Configuration
+        const S_URL = ''; 
+        const S_KEY = ''; 
+        const client = supabase.createClient(S_URL, S_KEY);
 
-    // Insert participant
-    const { data: participant, error: pErr } =
-      await supabase.from("participants")
-      .insert({ name, employee_id: employee })
-      .select()
-      .single();
+        const form = document.getElementById('prediction-form');
+        const submitBtn = document.getElementById('submit-btn');
 
-    if (pErr) {
-      alert("คุณได้ลงทะเบียนไปแล้ว");
-      return;
-    }
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('reg-name').value;
+            const nickname = document.getElementById('reg-nickname').value;
+            const dept = document.getElementById('reg-dept').value;
+            const empId = document.getElementById('reg-emp-id').value;
+            const lottoNum = document.getElementById('lotto-num').value;
 
-    // Insert prediction
-    await supabase.from("predictions").insert({
-      participant_id: participant.id,
-      predicted_number: number
-    });
+            if(lottoNum.length !== 5) {
+                alert('กรุณากรอกเลขลอตเตอรี่ให้ครบ 5 หลัก');
+                return;
+            }
 
-    localStorage.setItem("registered", "yes");
-    form.classList.add("hidden");
-    success.classList.remove("hidden");
-  });
-</script>
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> กำลังบันทึก...';
 
+            try {
+                // บันทึกข้อมูลพนักงาน
+                const { data, error } = await client.from('participants').insert([{ 
+                    name: `${name} (${nickname}) [${dept}]`, 
+                    employee_id: empId 
+                }]).select().single();
+                
+                if (error) throw error;
+
+                // บันทึกตัวเลขที่ทาย
+                await client.from('predictions').insert([{ 
+                    participant_id: data.id, 
+                    predicted_number: parseInt(lottoNum) 
+                }]);
+                
+                // แสดงหน้าจอสำเร็จ
+                document.getElementById('final-lotto-display').textContent = lottoNum;
+                document.getElementById('main-form').classList.add('hidden');
+                document.getElementById('success-box').classList.remove('hidden');
+                
+            } catch (err) {
+                alert('เกิดข้อผิดพลาด: ' + err.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'ส่งข้อมูลและทายผล <i class="fa-solid fa-paper-plane ml-2"></i>';
+            }
+        };
+    </script>
 </body>
 </html>
+
