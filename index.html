@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAMA V.2 - AI Sale Assistant</title>
+    <title>MAMA V.2 - Sale Assistant</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,7 +37,7 @@
         }
         
         :root {
-            --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+            --primary-gradient: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
             --dark-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
         
@@ -101,8 +101,8 @@
         
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #0ea5e9 !important;
-            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+            border-color: #f59e0b !important;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
         }
         
         .fixed-height {
@@ -111,8 +111,8 @@
         }
         
         /* Icon colors - flat colors */
-        .icon-primary { color: #0ea5e9; }
-        .icon-secondary { color: #6366f1; }
+        .icon-primary { color: #f59e0b; }
+        .icon-secondary { color: #ea580c; }
         .icon-success { color: #10b981; }
         .icon-warning { color: #f59e0b; }
         .icon-danger { color: #ef4444; }
@@ -120,9 +120,9 @@
         .icon-pink { color: #ec4899; }
         .icon-gray { color: #6b7280; }
         
-        /* Demo mode badge */
-        .demo-badge {
-            background: linear-gradient(45deg, #f59e0b, #fbbf24);
+        /* Orange theme badges */
+        .orange-badge {
+            background: linear-gradient(45deg, #f59e0b, #ea580c);
             color: white;
             font-weight: bold;
             padding: 4px 12px;
@@ -146,8 +146,8 @@
                         sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
                     },
                     colors: {
-                        'primary': '#0ea5e9',
-                        'secondary': '#6366f1',
+                        'primary': '#f59e0b',
+                        'secondary': '#ea580c',
                     }
                 }
             }
@@ -284,7 +284,118 @@
             }
         };
 
-        // Icon mapping - Flat color icons
+        // Prompt Library Database
+        const PROMPT_LIBRARY = {
+            "customer_analysis": [
+                {
+                    id: "CA1",
+                    title: "วิเคราะห์ความต้องการลูกค้าใหม่",
+                    prompt: "วิเคราะห์ความต้องการทางการเงินของลูกค้า อาชีพ [อาชีพ] อายุ [อายุ] รายได้ [รายได้] ต่อปี มีลูก [จำนวนลูก] คน หนี้สิน [หนี้สิน] บาท แนะนำแผนประกันที่เหมาะสม",
+                    category: "วิเคราะห์ลูกค้า",
+                    tags: ["ใหม่", "วิเคราะห์", "แนะนำแผน"]
+                },
+                {
+                    id: "CA2",
+                    title: "วิเคราะห์ความคุ้มครองที่มีอยู่",
+                    prompt: "ลูกค้ามีประกันสุขภาพจากบริษัทแล้ว แต่ต้องการเพิ่มเติมเพื่อครอบคลุมโรคร้ายแรงและค่ารักษาพยาบาลส่วนเกิน แนะนำแผนเสริม",
+                    category: "วิเคราะห์ลูกค้า",
+                    tags: ["เสริม", "สุขภาพ", "โรคร้ายแรง"]
+                }
+            ],
+            "product_comparison": [
+                {
+                    id: "PC1",
+                    title: "เปรียบเทียบแผนประกันชีวิต",
+                    prompt: "เปรียบเทียบแผนประกันชีวิตแบบสะสมทรัพย์กับแบบตลอดชีพ ข้อดีข้อเสียของแต่ละแผน สำหรับลูกค้าวัย [อายุ] ที่ต้องการ [เป้าหมาย]",
+                    category: "เปรียบเทียบผลิตภัณฑ์",
+                    tags: ["เปรียบเทียบ", "ชีวิต", "เลือกแผน"]
+                },
+                {
+                    id: "PC2",
+                    title: "เปรียบเทียบประกันสุขภาพ",
+                    prompt: "เปรียบเทียบแผนประกันสุขภาพ IPD/OPD กับแผนโรคร้ายแรง เน้นความคุ้มครองและเบี้ยประกันสำหรับครอบครัวที่มีลูกเล็ก",
+                    category: "เปรียบเทียบผลิตภัณฑ์",
+                    tags: ["สุขภาพ", "ครอบครัว", "เปรียบเทียบ"]
+                }
+            ],
+            "sales_script": [
+                {
+                    id: "SS1",
+                    title: "สคริปต์เปิดบทสนทนา",
+                    prompt: "สร้างบทสนทนาเปิดใจสำหรับลูกค้าอายุ [อายุ] อาชีพ [อาชีพ] ที่พบกันครั้งแรก เน้นการสร้างความสัมพันธ์และเข้าใจความต้องการ",
+                    category: "สคริปต์ขาย",
+                    tags: ["เปิดใจ", "บทสนทนา", "สร้างสัมพันธ์"]
+                },
+                {
+                    id: "SS2",
+                    title: "สคริปต์อธิบายผลประโยชน์",
+                    prompt: "อธิบายผลประโยชน์ของแผนประกัน [ชื่อแผน] ด้วยภาษาง่ายๆ เปรียบเทียบกับค่าครองชีพประจำวัน เพื่อให้ลูกค้าเห็นภาพความคุ้มค่า",
+                    category: "สคริปต์ขาย",
+                    tags: ["อธิบาย", "ผลประโยชน์", "เข้าใจง่าย"]
+                },
+                {
+                    id: "SS3",
+                    title: "สคริปต์ปิดการขาย",
+                    prompt: "ปิดการขายแผนประกัน [ชื่อแผน] โดยสรุปจุดเด่นที่ลูกค้าชอบและแก้ไขข้อกังวล [ข้อกังวล] พร้อมสร้างความเร่งด่วน",
+                    category: "สคริปต์ขาย",
+                    tags: ["ปิดการขาย", "สรุป", "แก้ข้อกังวล"]
+                }
+            ],
+            "objection_handling": [
+                {
+                    id: "OH1",
+                    title: "ตอบข้อโต้แย้ง 'เงินไม่พอ'",
+                    prompt: "ลูกค้าบอกว่า 'เงินไม่พอ' จะซื้อประกัน ตอบอย่างไรให้ลูกค้าเห็นความสำคัญและเริ่มต้นด้วยแผนที่เหมาะสมกับงบประมาณ",
+                    category: "ตอบข้อโต้แย้ง",
+                    tags: ["เงินไม่พอ", "งบประมาณ", "เริ่มต้น"]
+                },
+                {
+                    id: "OH2",
+                    title: "ตอบข้อโต้แย้ง 'มีประกันเยอะแล้ว'",
+                    prompt: "ลูกค้าบอกว่า 'มีประกันเยอะแล้ว' จะชวนลูกค้าตรวจสอบความคุ้มครองที่มีและชี้ให้เห็นจุดที่ยังขาดอย่างไร",
+                    category: "ตอบข้อโต้แย้ง",
+                    tags: ["มีแล้ว", "ตรวจสอบ", "เติมเต็ม"]
+                }
+            ]
+        };
+
+        // Conversation Scripts Database
+        const CONVERSATION_SCRIPTS = {
+            "ice_breaking": [
+                {
+                    id: "IB1",
+                    title: "เปิดบทสนทนากับลูกค้าใหม่",
+                    script: "สวัสดีครับ/ค่ะ ดิฉัน/ผม [ชื่อตัวแทน] จากบริษัทประกันชีวิต ดิฉัน/ผมเห็นว่าคุณสนใจเรื่องการวางแผนการเงิน วันนี้มีโอกาสดีมาพูดคุยแลกเปลี่ยนกันค่ะ",
+                    tips: ["ยิ้มแย้มแจ่มใส", "เริ่มจากคำถามทั่วไปก่อน", "สร้างบรรยากาศเป็นกันเอง"],
+                    follow_up: "คุณพอมีเวลาสัก 10 นาทีไหมครับ/คะ เพื่อที่ดิฉัน/ผมจะได้แนะนำตัวและเข้าใจความต้องการของคุณมากขึ้น"
+                },
+                {
+                    id: "IB2",
+                    title: "เชื่อมโยงกับอาชีพลูกค้า",
+                    script: "ในฐานะที่คุณเป็น [อาชีพ] ดิฉัน/ผมเข้าใจดีว่าความเสี่ยงในอาชีพนี้มีอะไรบ้าง และการวางแผนการเงินมีความสำคัญอย่างไรสำหรับคุณ",
+                    tips: ["แสดงความเข้าใจในอาชีพ", "ยกตัวอย่างกรณีศึกษา", "เชื่อมโยงกับชีวิตจริง"],
+                    follow_up: "เคยมีลูกค้าที่เป็น [อาชีพ] เช่นกันเลือกแผนนี้เพราะตอบโจทย์ไลฟ์สไตล์การทำงาน คุณอยากทราบรายละเอียดไหมครับ/คะ?"
+                }
+            ],
+            "objection_scenarios": [
+                {
+                    id: "OS1",
+                    title: "สถานการณ์: ลูกค้าบอก 'เงินไม่พอ'",
+                    script: "ลูกค้า: 'ช่วงนี้ค่าใช้จ่ายเยอะ ไม่มีเงินพอจะซื้อประกัน'\n\nตัวแทน: 'ผม/ดิฉันเข้าใจดีครับ/ค่ะว่าตอนนี้ค่าครองชีพสูงมาก ลูกค้าหลายท่านก็มีความกังวลแบบเดียวกัน แต่หลังจากได้คุยกันพบว่า...'",
+                    technique: "LSCPA (ฟัง-แบ่งปัน-ชี้แจง-ดำเนินการ-ถาม)",
+                    key_points: ["แสดงความเข้าใจ", "ยกตัวอย่างลูกค้าที่มีสถานการณ์คล้ายกัน", "เสนอแผนเริ่มต้นเล็กๆ"]
+                },
+                {
+                    id: "OS2",
+                    title: "สถานการณ์: ลูกค้าบอก 'ขอปรึกษาครอบครัวก่อน'",
+                    script: "ลูกค้า: 'เดี๋ยวต้องกลับไปปรึกษาครอบครัวก่อนครับ/คะ'\n\nตัวแทน: 'เป็นการตัดสินใจที่ดีมากครับ/คะที่ปรึกษาครอบครัว เพราะแผนการเงินที่ดีควรได้รับการสนับสนุนจากคนในครอบครัว...'",
+                    technique: "Value Proposition (เน้นคุณค่า)",
+                    key_points: ["ชื่นชมการตัดสินใจ", "เสนอเอกสารสรุปให้นำไปปรึกษา", "นัดหมายติดตามผล"]
+                }
+            ]
+        };
+
+        // Icon mapping - Flat color icons (Orange theme)
         const ICONS = {
             calculator: '<i class="fas fa-calculator icon-primary"></i>',
             message: '<i class="fas fa-comment-dots icon-secondary"></i>',
@@ -308,11 +419,18 @@
             share: '<i class="fas fa-share-alt icon-primary"></i>',
             save: '<i class="fas fa-save icon-primary"></i>',
             chevronRight: '<i class="fas fa-chevron-right"></i>',
-            demoBadge: '<i class="fas fa-flask icon-warning"></i>'
+            library: '<i class="fas fa-book icon-primary"></i>',
+            script: '<i class="fas fa-scroll icon-warning"></i>',
+            users: '<i class="fas fa-users icon-secondary"></i>',
+            heart: '<i class="fas fa-heart icon-danger"></i>',
+            clipboard: '<i class="fas fa-clipboard-list icon-success"></i>',
+            search: '<i class="fas fa-search icon-primary"></i>',
+            filter: '<i class="fas fa-filter icon-secondary"></i>',
+            download: '<i class="fas fa-download icon-primary"></i>'
         };
 
-        // --- Demo Mode Analysis Engine ---
-        class DemoAnalysisEngine {
+        // --- Rule-based Analysis Engine ---
+        class RuleBasedEngine {
             static analyzeNeeds(formData, rhData, zone) {
                 const income = parseFloat(formData.income) || 0;
                 const expense = parseFloat(formData.expense) || 0;
@@ -325,7 +443,7 @@
                 const gap = Math.max(0, totalNeed - assets);
                 const months = expense > 0 ? (assets / expense) : 0;
                 
-                // Risk assessment
+                // Risk assessment based on rules
                 let riskLevel = "ต่ำ";
                 let recommendations = [];
                 
@@ -333,21 +451,32 @@
                 else if (gap > income * 3) riskLevel = "สูง";
                 else if (gap > income * 1) riskLevel = "ปานกลาง";
                 
-                // Generate recommendations
+                // Rule-based recommendations
                 if (gap > 0) {
-                    recommendations.push(`ควรมีประกันชีวิตอย่างน้อย ${Math.round(gap / 1000000)} ล้านบาท`);
+                    const recommendedCoverage = Math.round(gap / 1000000);
+                    recommendations.push(`ควรมีทุนประกันชีวิตอย่างน้อย ${recommendedCoverage} ล้านบาท`);
                 }
                 
                 if (expense > income * 0.4) {
-                    recommendations.push("พิจารณาปรับลดค่าใช้จ่ายที่ไม่จำเป็น");
+                    recommendations.push("พิจารณาปรับลดค่าใช้จ่ายที่ไม่จำเป็น หรือหารายได้เสริม");
                 }
                 
                 if (dependents > 0) {
-                    recommendations.push(`ควรมีประกันการศึกษาสำหรับลูก ${dependents >= 2 ? "แต่ละคน" : ""}`);
+                    recommendations.push(`ควรวางแผนการศึกษาสำหรับลูก ${dependents >= 2 ? 'แต่ละคน' : ''}`);
                 }
                 
                 if (years < 10) {
-                    recommendations.push("ควรวางแผนระยะยาวเพิ่มเติมสำหรับวัยเกษียณ");
+                    recommendations.push("ควรวางแผนการออมระยะยาวเพิ่มเติมสำหรับวัยเกษียณ");
+                }
+                
+                // Check existing insurance
+                if (formData.insurance_existing && formData.insurance_existing.trim() !== "") {
+                    recommendations.push("ตรวจสอบความคุ้มครองที่มีอยู่แล้วว่าครอบคลุมความเสี่ยงหลักหรือไม่");
+                }
+                
+                // Check insurance gap
+                if (formData.insurance_gap && formData.insurance_gap.trim() !== "") {
+                    recommendations.push(`เน้นเติมเต็มในส่วนที่ลูกค้ารู้สึกว่าคุ้มครองไม่พอ: ${formData.insurance_gap}`);
                 }
                 
                 const metaphor = rhData.metaphors ? rhData.metaphors[Math.floor(Math.random() * rhData.metaphors.length)] : "เทียบกับค่าครองชีพในพื้นที่";
@@ -357,85 +486,128 @@
                     months: months.toFixed(1),
                     riskLevel,
                     recommendations,
-                    metaphor
+                    metaphor,
+                    actionPlan: `1. เริ่มต้นด้วยทุนประกัน ${Math.max(1000000, Math.round(gap * 0.3)).toLocaleString()} บาท\n2. เติมเต็มประกันสุขภาพครอบคลุมโรคร้ายแรง\n3. วางแผนการออมระยะยาว`
                 };
             }
             
-            static analyzeIceBreaking(formData, rhData, zone) {
+            static generateIceBreaking(formData, rhData, zone) {
                 const age = formData.age || "35-40";
                 const job = formData.job || "อาชีพทั่วไป";
                 const location = formData.location || "สถานที่พบกัน";
                 const observation = formData.observation || "";
+                const relationshipLevel = formData.relationship_level || "ใหม่";
+                const commonInterest = formData.common_interest || "";
                 
                 const commonGround = rhData.commonGrounds ? rhData.commonGrounds[Math.floor(Math.random() * rhData.commonGrounds.length)] : "วัฒนธรรมท้องถิ่น";
                 
-                // Generate conversation starters
-                const starters = [
-                    `"สวัสดีครับ/ค่ะ ดิฉัน/ผมเป็นที่ปรึกษาการเงินจาก MAMA AI วันนี้มีโอกาสดีมาแนะนำแผนการเงินที่เหมาะกับคน${age}อย่างคุณ"`,
-                    `"ในฐานะ${job} คุณคงเข้าใจดีว่าความมั่นคงทางการเงินสำคัญแค่ไหน ใช่ไหมครับ/คะ?"`,
-                    `"เห็นคุณมา${location} นึกถึงเรื่องหนึ่งที่เกี่ยวข้องกับ${commonGround}พอดี..."`
-                ];
+                // Rule-based conversation starters
+                const starters = [];
+                
+                if (relationshipLevel === "ใหม่") {
+                    starters.push(`"สวัสดีครับ/ค่ะ ดิฉัน/ผมเป็นที่ปรึกษาการเงินจาก MAMA วันนี้มีโอกาสดีมาแนะนำตัวและทำความรู้จักกัน"`);
+                } else if (relationshipLevel === "พอคุ้นเคย") {
+                    starters.push(`"สวัสดีครับ/ค่ะ ดีใจที่ได้พบกันอีกครั้ง คราวก่อนคุยกันเรื่อง ${commonInterest || 'การวางแผนการเงิน'} ผม/ดิฉันมีข้อมูลเพิ่มเติมมาแบ่งปันค่ะ"`);
+                } else {
+                    starters.push(`"สวัสดีครับ/ค่ะ กลับมาพบกันอีกแล้วนะครับ/คะ วันนี้มีแผนใหม่ๆ มาแนะนำโดยเฉพาะสำหรับคุณ"`);
+                }
                 
                 const jobConnection = [
-                    `"สำหรับ${job}แบบคุณ มักมีความเสี่ยงเรื่อง... เรามีแผนที่จัดการได้"`,
+                    `"สำหรับ${job}แบบคุณ มักมีความเสี่ยงเรื่องรายได้ไม่สม่ำเสมอ/อุบัติเหตุจากการทำงาน เรามีแผนที่จัดการได้"`,
                     `"ลูกค้าที่เป็น${job}หลายท่านเลือกแผนนี้เพราะตอบโจทย์ไลฟ์สไตล์ทำงาน"`,
-                    `"อาชีพ${job}มีข้อดีหลายอย่าง แต่ในแง่การเงินอาจมีจุดที่ต้องเสริม..."`
+                    `"อาชีพ${job}มีข้อดีหลายอย่าง แต่ในแง่การเงินอาจมีจุดที่ต้องเสริม เช่น การคุ้มครองรายได้ระหว่างพักฟื้น"`
                 ];
                 
                 const hook = [
                     `"ถ้ามีวันหนึ่งคุณไม่สามารถทำงานได้อีก ${dependents > 0 ? 'ลูก' : 'ครอบครัว'}คุณจะมีเงินใช้กี่เดือน?"`,
-                    `"เคยคำนวณไหมว่า ถ้าวันนี้คุณหายไป รายได้ที่ขาดหายจะเท่าไร?"`,
+                    `"เคยคำนวณไหมว่า ถ้าวันนี้คุณหายไปจากครอบครัว รายได้ที่ขาดหายจะเท่าไร?"`,
                     `"สุขภาพที่ดีวันนี้ ไม่รับประกันว่าจะดีไปตลอด เราวางแผนกันยังไงดี?"`
                 ];
+                
+                // Observation-based approach
+                let observationApproach = "";
+                if (observation.includes("สมาร์ทวอทช์") || observation.includes("นาฬิกา")) {
+                    observationApproach = "เห็นคุณใส่สมาร์ทวอทช์ นั่นแสดงว่าคุณใส่ใจสุขภาพดีนะครับ/คะ การวางแผนการเงินก็เหมือนการติดตามสุขภาพทางการเงิน";
+                } else if (observation.includes("หนังสือลงทุน") || observation.includes("หุ้น")) {
+                    observationApproach = "เห็นคุณสนใจการลงทุน เป็นสิ่งที่ดีมากครับ/คะ การประกันชีวิตก็เป็นการลงทุนในความมั่นคงของครอบครัว";
+                } else if (observation.includes("รีบ")) {
+                    observationApproach = "เห็นคุณดูรีบๆ นะครับ/คะ แต่อยากให้มีเวลาสัก 10 นาทีคุยกันเรื่องที่สำคัญกับอนาคตการเงินของคุณ";
+                }
                 
                 return {
                     starters,
                     jobConnection,
                     hook,
+                    observationApproach,
                     tone: rhData.tone || "เป็นมืออาชีพ",
-                    commonGround
+                    commonGround,
+                    tips: [
+                        "เริ่มจากประเด็นทั่วไปก่อนเข้าสู่ธุรกิจ",
+                        "ถามถึงความกังวลทางการเงิน",
+                        "เสนอตัวอย่างกรณีศึกษาที่ใกล้เคียง"
+                    ]
                 };
             }
             
             static handleObjection(formData, rhData, zone) {
                 const type = formData.type || "เงินไม่พอ";
                 const quote = formData.direct_quote || "";
+                const customerTone = formData.customer_tone || "กังวล";
+                const previousAttempts = formData.previous_attempts || "";
                 
                 const rule = OBJECTION_RULES[type] || OBJECTION_RULES["เงินไม่พอ"];
                 
-                // Generate LSCPA response
-                const lscpa = {
-                    Listen: `"${quote ? 'คุณบอกว่า: \"' + quote + '\"' : 'ผม/ดิฉันเข้าใจความกังวลของคุณ'}"`,
-                    Share: `"ลูกค้าหลายท่านใน${zone}ก็มีความคิดแบบนี้ แต่หลังจากคุยกันพบว่า..."`,
-                    Clarify: rule.responses[1] || "การวางแผนการเงินเป็นการลงทุนในความมั่นคง ไม่ใช่ค่าใช้จ่าย",
-                    Proceed: "เรามาดูแผนที่เริ่มจากน้อยๆ ก่อนได้ไหม? ผม/ดิฉันมีตัวอย่างให้ดู",
-                    Ask: "คุณคิดว่ายังไงกับแนวทางนี้ครับ/คะ?"
-                };
+                // Tone-based response adjustment
+                let toneAdjustment = "";
+                if (customerTone === "กังวล") {
+                    toneAdjustment = "ใช้น้ำเสียงที่เข้าใจและเห็นใจ";
+                } else if (customerTone === "ไม่มั่นใจ") {
+                    toneAdjustment = "เพิ่มข้อมูลสนับสนุนและตัวอย่างกรณีศึกษา";
+                } else if (customerTone === "ปฏิเสธ") {
+                    toneAdjustment = "อย่าพยายามโน้มน้าว แต่ถามถึงเหตุผลเบื้องหลัง";
+                } else if (customerTone === "เหนื่อย") {
+                    toneAdjustment = "พูดสั้นๆ กระชับ และเสนอทางเลือกที่ง่าย";
+                }
                 
-                const reframing = `"แทนที่จะมองว่าเป็นค่าใช้จ่าย ลองมองว่าเป็น${rule.comparison}สิครับ/คะ"`;
+                // Check previous attempts
+                let learnFromPrevious = "";
+                if (previousAttempts) {
+                    learnFromPrevious = `จากที่คุณเคยลอง ${previousAttempts} เรามาลองวิธีอื่นดูไหมครับ/คะ`;
+                }
                 
-                const regionalExample = rhData.keywords ? ` เช่น คน${zone}มักจะกังวลเรื่อง "${rhData.keywords[Math.floor(Math.random() * rhData.keywords.length)]}"` : "";
-                
-                return {
+                // Generate response based on rules
+                const response = {
                     technique: rule.technique,
-                    lscpa,
-                    reframing,
-                    regionalExample,
-                    closing: `"ไม่ว่า${type} เรามีทางเลือกให้คุณเสมอ"`
+                    steps: [
+                        `ฟัง: "คุณบอกว่า: ${quote || '...'} ผม/ดิฉันเข้าใจดีครับ/คะ"`,
+                        `แบ่งปัน: "ลูกค้าหลายท่านใน${zone}ก็มีความคิดแบบนี้ แต่หลังจากคุยกันพบว่า..."`,
+                        `ชี้แจง: "${rule.responses[1]}"`,
+                        `ดำเนินการ: "${rule.responses[2]}"`,
+                        `ถาม: "คุณคิดว่ายังไงกับแนวทางนี้ครับ/คะ?"`
+                    ],
+                    reframing: `"แทนที่จะมองว่าเป็นค่าใช้จ่าย ลองมองว่าเป็น${rule.comparison}สิครับ/คะ"`,
+                    toneAdjustment,
+                    learnFromPrevious,
+                    closing: `"ไม่ว่าคุณจะกังวลเรื่อง${type} เรามีทางเลือกให้คุณเสมอ"`
                 };
+                
+                return response;
             }
             
             static simplifyPlan(formData, rhData, zone) {
                 const planName = formData.plan_name || "แผนประกัน";
                 const premium = parseFloat(formData.premium) || 10000;
                 const benefits = formData.benefits || "";
+                const competitorComparison = formData.competitor_comparison || "ไม่รู้จัก";
+                const uniqueSellingPoint = formData.unique_selling_point || "";
                 
                 const dailyCost = (premium / 365).toFixed(2);
+                const monthlyCost = (premium / 12).toFixed(2);
                 
-                // Local cost comparison
+                // Local cost comparison based on zone
                 let localComparison = "ค่ากาแฟ 1 แก้ว";
                 if (zone.includes("กรุงเทพ") || zone.includes("สาทร") || zone.includes("สุขุมวิท")) {
-                    localComparison = "ค่ากาแฟร้าน Starbucks";
+                    localComparison = "ค่ากาแฟร้าน Starbucks 1 แก้ว";
                 } else if (zone.includes("พัทยา") || zone.includes("ภูเก็ต")) {
                     localComparison = "ค่าเครื่องดื่ม 1 แก้วในร้านริมทะเล";
                 } else if (zone.includes("เชียงใหม่")) {
@@ -447,100 +619,192 @@
                 }
                 
                 // Extract benefits
-                const benefitList = benefits.split('\n').filter(b => b.trim()).slice(0, 3);
+                const benefitList = benefits.split('\n').filter(b => b.trim()).slice(0, 5);
                 const simplifiedBenefits = benefitList.length > 0 ? benefitList : [
                     "คุ้มครองชีวิตและสุขภาพครบวงจร",
                     "เบี้ยคงที่ตลอดสัญญา",
-                    "เงินคืนเมื่อครบอายุสัญญา"
+                    "เงินคืนเมื่อครบอายุสัญญา",
+                    "คุ้มครองโรคร้ายแรง",
+                    "บริการรถพยาบาลฟรี"
                 ];
                 
-                // Generate 3 golden sentences
+                // Competitor strategy
+                let competitorStrategy = "";
+                if (competitorComparison === "รู้จักชื่อคู่แข่ง") {
+                    competitorStrategy = "เน้นจุดเด่นที่แตกต่างจากคู่แข่ง เช่น เงื่อนไขที่ง่ายกว่า หรือบริการหลังการขายที่ดีกว่า";
+                } else if (competitorComparison === "เคยได้ยิน") {
+                    competitorStrategy = "อธิบายความน่าเชื่อถือของบริษัทเราและเครือข่ายโรงพยาบาล";
+                } else {
+                    competitorStrategy = "สร้างความเข้าใจในผลิตภัณฑ์ก่อน แล้วค่อยเปรียบเทียบในภายหลัง";
+                }
+                
+                // Generate golden sentences
                 const goldenSentences = [
                     `"คุ้มครองชีวิตและสุขภาพรายวันในราคาเพียง ${dailyCost} บาท/วัน (เท่ากับ${localComparison})"`,
                     `"${simplifiedBenefits[0].replace(/[0-9\.]+/g, '').substring(0, 50)}"`,
-                    `"วางแผนการเงินมั่นใจได้ เพราะ${planName}ดูแลคุณทั้งวันนี้และวันหน้า"`
+                    `"วางแผนการเงินมั่นใจได้ เพราะ${planName}ดูแลคุณทั้งวันนี้และวันหน้า"`,
+                    `"เบี้ยเริ่มต้นเพียง ${monthlyCost} บาท/เดือน คุ้มครองได้ทั้งครอบครัว"`
                 ];
+                
+                // Add USP if provided
+                if (uniqueSellingPoint) {
+                    goldenSentences.push(`"${uniqueSellingPoint.substring(0, 80)}"`);
+                }
                 
                 return {
                     dailyCost,
+                    monthlyCost,
                     localComparison,
-                    goldenSentences,
-                    benefitSummary: simplifiedBenefits
+                    goldenSentences: goldenSentences.slice(0, 3),
+                    benefitSummary: simplifiedBenefits,
+                    competitorStrategy,
+                    presentationTips: [
+                        "เปรียบเทียบกับค่าครองชีพในพื้นที่",
+                        "เน้นความคุ้มค่าต่อวันมากกว่าต่อปี",
+                        "ยกตัวอย่างกรณีศึกษาจริงในพื้นที่",
+                        "ใช้ภาษาง่ายๆ ไม่ใช้ศัพท์เทคนิคมากเกินไป"
+                    ]
                 };
             }
             
             static matchProduct(formData, rhData, zone) {
                 const goal = formData.goal || "ลดหย่อนภาษี";
                 const budget = parseFloat(formData.budget) || 30000;
+                const existingCoverage = formData.existing_coverage || "";
+                const priorityLevel = formData.priority_level || "ปานกลาง";
                 
                 const products = INSURANCE_PRODUCTS[goal] || INSURANCE_PRODUCTS["ลดหย่อนภาษี"];
                 
-                // Find best match based on budget
-                let bestMatch = products[0];
-                let bestScore = Infinity;
+                // Rule-based product matching
+                let recommendedProduct = products[0];
+                let reason = "";
                 
-                products.forEach(product => {
-                    const priceRange = product.premium.split('-').map(p => parseInt(p.replace(/[^0-9]/g, '')));
-                    const avgPrice = (priceRange[0] + (priceRange[1] || priceRange[0])) / 2;
-                    const score = Math.abs(avgPrice - budget);
-                    
-                    if (score < bestScore) {
-                        bestScore = score;
-                        bestMatch = product;
-                    }
-                });
-                
-                // Localize recommendation
-                let localReason = "";
-                if (goal === "ค่ารักษาพยาบาล (สุขภาพ)") {
-                    localReason = `คน${zone} มักใช้บริการ ${rhData.hospitals ? rhData.hospitals[0] : "โรงพยาบาลชั้นนำ"} ดังนั้นแผนสุขภาพจึงสำคัญ`;
+                if (goal === "ลดหย่อนภาษี") {
+                    recommendedProduct = products.find(p => p.name.includes("ออมทรัพย์")) || products[0];
+                    reason = "เหมาะสำหรับการลดหย่อนภาษีสูงสุด 100% และมีเงินคืนเมื่อครบสัญญา";
+                } else if (goal === "ค่ารักษาพยาบาล (สุขภาพ)") {
+                    recommendedProduct = products.find(p => p.name.includes("IPD/OPD")) || products[0];
+                    reason = "ครอบคลุมค่ารักษาพยาบาลทั้งผู้ป่วยในและผู้ป่วยนอก เหมาจ่ายตามจริง";
                 } else if (goal === "มรดกให้ลูกหลาน") {
-                    localReason = `ตามวัฒนธรรม${zone} การเตรียมมรดกให้ลูกหลานเป็นเรื่องสำคัญ`;
-                } else {
-                    localReason = `แผนนี้ตอบโจทย์คน${zone} ที่มักจะมีลักษณะ${rhData.keywords ? rhData.keywords[0] : "เฉพาะตัว"}`;
+                    recommendedProduct = products.find(p => p.name.includes("ตลอดชีพ")) || products[0];
+                    reason = "คุ้มครองตลอดชีวิต มรดกให้ทายาทโดยไม่ต้องเสียภาษี";
+                } else if (goal === "เงินออม/เกษียณ") {
+                    recommendedProduct = products.find(p => p.name.includes("บำนาญ")) || products[0];
+                    reason = "รับเงินบำนาญเมื่อเกษียณ สร้างรายได้มั่นคงในวัยทอง";
                 }
                 
-                // Gap analysis
-                const existingWelfare = ["ประกันสังคม", "สวัสดิการบริษัท", "เงินออมส่วนตัว"];
-                const missingCoverage = ["ค่ารักษาพยาบาลส่วนเกิน", "รายได้ทดแทน", "มรดกที่จับต้องได้"];
+                // Budget check
+                const priceRange = recommendedProduct.premium.split('-').map(p => parseInt(p.replace(/[^0-9]/g, '')));
+                const minPrice = priceRange[0];
+                const maxPrice = priceRange[1] || priceRange[0];
+                
+                let budgetFit = "พอดี";
+                if (budget < minPrice) {
+                    budgetFit = "ต่ำกว่าเกณฑ์ (อาจต้องปรับแผนหรือเลือกรุ่นเริ่มต้น)";
+                } else if (budget > maxPrice * 1.5) {
+                    budgetFit = "สูงกว่าเกณฑ์ (สามารถเพิ่มความคุ้มครองได้)";
+                }
+                
+                // Analyze existing coverage
+                const existingWelfare = ["ประกันสังคม"];
+                if (existingCoverage.includes("บริษัท") || existingCoverage.includes("องค์กร")) {
+                    existingWelfare.push("สวัสดิการบริษัท");
+                }
+                if (existingCoverage.includes("รถ") || existingCoverage.includes("ทรัพย์สิน")) {
+                    existingWelfare.push("ประกันภัยรถ/ทรัพย์สิน");
+                }
+                
+                // Identify missing coverage
+                const missingCoverage = [];
+                if (goal === "ค่ารักษาพยาบาล (สุขภาพ)" && !existingCoverage.includes("สุขภาพ")) {
+                    missingCoverage.push("ค่ารักษาพยาบาลส่วนเกินจากประกันสังคม");
+                }
+                if (goal === "มรดกให้ลูกหลาน" && !existingCoverage.includes("ชีวิต")) {
+                    missingCoverage.push("ทุนประกันชีวิตเพื่อมรดก");
+                }
+                if (goal === "เงินออม/เกษียณ" && !existingCoverage.includes("ออม")) {
+                    missingCoverage.push("การออมระยะยาวเพื่อวัยเกษียณ");
+                }
+                
+                // Priority-based action plan
+                let actionPlan = "";
+                if (priorityLevel === "สูง") {
+                    actionPlan = `เริ่มต้นทันทีด้วยเบี้ย ${Math.max(10000, budget * 0.9).toLocaleString()} บาท/ปี เพื่อความคุ้มครองเบื้องต้น`;
+                } else if (priorityLevel === "ปานกลาง") {
+                    actionPlan = `เริ่มต้นภายในเดือนนี้ด้วยเบี้ย ${Math.max(8000, budget * 0.8).toLocaleString()} บาท/ปี`;
+                } else {
+                    actionPlan = `วางแผนล่วงหน้า เบี้ยประมาณ ${budget.toLocaleString()} บาท/ปี เริ่มต้นไตรมาสหน้า`;
+                }
                 
                 return {
-                    recommendedProduct: bestMatch,
-                    budgetFit: budget >= parseInt(bestMatch.premium.split('-')[0].replace(/[^0-9]/g, '')) ? "พอดี" : "อาจต้องปรับแผน",
-                    localReason,
+                    recommendedProduct,
+                    budgetFit,
+                    reason,
                     existingWelfare,
-                    missingCoverage,
-                    actionPlan: `เริ่มต้นด้วยเบี้ย ${Math.max(10000, budget * 0.8).toLocaleString()} บาท/ปี แล้วปรับเพิ่มตามรายได้`
+                    missingCoverage: missingCoverage.length > 0 ? missingCoverage : ["การคุ้มครองเฉพาะทางตามเป้าหมาย"],
+                    actionPlan,
+                    nextSteps: [
+                        "ตรวจสอบคุณสมบัติเบื้องต้น",
+                        "เตรียมเอกสารประกอบการสมัคร",
+                        "นัดหมายเพื่อเริ่มกระบวนการ"
+                    ]
                 };
             }
             
             static generateClosing(formData, rhData, zone) {
-                const interest = formData.interest_point || "ความคุ้มครองสุขภาพ";
-                const concern = formData.last_concern || "ค่าเบี้ยประกัน";
+                const interestPoint = formData.interest_point || "ความคุ้มครองสุขภาพ";
+                const lastConcern = formData.last_concern || "ค่าเบี้ยประกัน";
+                const timeline = formData.timeline || "ยังไม่แน่ใจ";
+                const decisionMaker = formData.decision_maker || "ตัวเอง";
                 
-                // Urgency factor based on region
+                // Urgency factor based on region and timeline
                 let urgency = "";
                 if (zone.includes("กรุงเทพ") || zone.includes("ปริมณฑล")) {
-                    urgency = "สิทธิพิเศษโรงพยาบาลเอกชนชั้นนำ";
+                    urgency = "สิทธิพิเศษโรงพยาบาลเอกชนชั้นนำในเครือข่าย";
                 } else if (zone.includes("พัทยา") || zone.includes("ภูเก็ต")) {
-                    urgency = "โควต้าสำหรับลูกค้าพื้นที่ท่องเที่ยว";
+                    urgency = "โปรโมชั่นพิเศษสำหรับลูกค้าพื้นที่ท่องเที่ยว";
                 } else if (zone.includes("เชียงใหม่")) {
-                    urgency = "โปรโมชั่นพิเศษสำหรับคนเหนือ";
+                    urgency = "สิทธิพิเศษโรงพยาบาลในเครือข่ายภาคเหนือ";
                 } else {
-                    urgency = "สิทธิพิเศษโรงพยาบาลในเครือข่าย";
+                    urgency = "เครือข่ายโรงพยาบาลในพื้นที่";
+                }
+                
+                // Timeline-based approach
+                let timelineStrategy = "";
+                if (timeline === "ภายในสัปดาห์นี้") {
+                    timelineStrategy = "เราสามารถเริ่มกระบวนการได้ทันทีเพื่อไม่ให้พลาดสิทธิประโยชน์";
+                } else if (timeline === "ภายในเดือนนี้") {
+                    timelineStrategy = "ควรเริ่มต้นกระบวนการภายใน 1-2 สัปดาห์ เพื่อให้ทันภายในเดือนนี้";
+                } else if (timeline === "วางแผนล่วงหน้า") {
+                    timelineStrategy = "เป็นการวางแผนที่ดี การเริ่มต้นเร็วจะทำให้ได้รับความคุ้มครองเร็วขึ้น";
+                } else {
+                    timelineStrategy = "เรามาเริ่มต้นวางแผนกันตั้งแต่วันนี้ เพื่ออนาคตการเงินที่มั่นคง";
+                }
+                
+                // Decision maker strategy
+                let decisionMakerStrategy = "";
+                if (decisionMaker === "คู่สมรส" || decisionMaker === "ผู้ปกครอง") {
+                    decisionMakerStrategy = `ควรปรึกษากับ${decisionMaker}ร่วมกัน เพื่อการตัดสินใจที่ครอบคลุมทุกความต้องการ`;
+                } else if (decisionMaker === "ตัวเอง") {
+                    decisionMakerStrategy = "คุณสามารถตัดสินใจได้ทันทีเพื่อความคุ้มครองที่รวดเร็ว";
+                } else {
+                    decisionMakerStrategy = "ควรมีผู้มีส่วนร่วมในการตัดสินใจเพื่อความมั่นใจ";
                 }
                 
                 // Alternative close techniques
                 const closes = [
-                    `"คุณสะดวกเริ่มแผนวันไหนดีครับ/คะ หรือจะรอให้ถึง${new Date(new Date().setDate(new Date().getDate() + 7)).toLocaleDateString('th-TH')}?"`,
-                    `"คุณอยากเน้น${interest}เป็นหลัก หรือมีประเด็นอื่นที่กังวลนอกจาก${concern}?"`,
-                    `"เพื่อไม่ให้พลาด${urgency} เราเริ่มต้นเอกสารเบื้องต้นเลยดีไหม?"`
+                    `"คุณสะดวกเริ่มแผนวันไหนดีครับ/คะ หรือจะเริ่มตั้งแต่วันนี้เลย?"`,
+                    `"คุณอยากเน้น${interestPoint}เป็นหลัก หรือมีประเด็นอื่นที่กังวลนอกจาก${lastConcern}?"`,
+                    `"เพื่อไม่ให้พลาด${urgency} เราเริ่มต้นเอกสารเบื้องต้นเลยดีไหม?"`,
+                    `"ระหว่างแผน A ที่เน้น${interestPoint} กับแผน B ที่เน้นค่าเบี้ยต่ำ คุณชอบแนวทางไหนมากกว่าครับ/คะ?"`
                 ];
                 
-                const summary = `"สรุปคือ คุณชอบใน${interest} แต่กังวลเรื่อง${concern} ทางเราแก้โดย... และมี${urgency}ให้ด้วย"`;
+                const summary = `"สรุปคือ คุณให้ความสำคัญกับ${interestPoint} แต่กังวลเรื่อง${lastConcern} ทางเรามีวิธีแก้โดย... และมี${urgency}ให้ด้วย"`;
                 
                 return {
                     urgency,
+                    timelineStrategy,
+                    decisionMakerStrategy,
                     closes,
                     summary,
                     nextStep: "กรอกใบสมัครเบื้องต้นเพื่อจองสิทธิ์",
@@ -548,73 +812,88 @@
                 };
             }
             
-            static designPrompt(formData, rhData, zone) {
-                const objective = formData.objective || "สร้างบทสนทนา";
-                const target = formData.target || "ลูกค้า";
-                const tone = formData.tone || "Professional";
-                const details = formData.details || "";
-                
-                // Analyze intent
-                let intentAnalysis = "";
-                if (objective.includes("โพสต์") || objective.includes("Facebook") || objective.includes("โซเชียล")) {
-                    intentAnalysis = "สร้างคอนเทนต์สำหรับโซเชียลมีเดีย เน้นดึงดูดความสนใจและสร้างการมีส่วนร่วม";
-                } else if (objective.includes("บทสนทนา") || objective.includes("พูดคุย")) {
-                    intentAnalysis = "ออกแบบบทสนทนาสำหรับการพบปะลูกค้าโดยตรง เน้นธรรมชาติและสัมพันธภาพ";
-                } else if (objective.includes("เสนอขาย") || objective.includes("พรีเซนต์")) {
-                    intentAnalysis = "สร้างสคริปต์สำหรับการนำเสนอขาย เน้นความน่าเชื่อถือและข้อมูลชัดเจน";
-                } else {
-                    intentAnalysis = "ออกแบบสื่อสารทางการตลาดที่ตอบโจทย์วัตถุประสงค์ที่ระบุ";
+            static getPromptLibrary(category = "all") {
+                if (category === "all") {
+                    return PROMPT_LIBRARY;
                 }
-                
-                // Master prompt
-                const masterPrompt = `Role: คุณคือที่ปรึกษาประกันมืออาชีพที่เข้าใจลึกซึ้งเกี่ยวกับพื้นที่${zone}
-Context: ${rhData.name} - ${rhData.dynamics}
-Target Audience: ${target}
-Tone: ${tone} ${tone === "Professional" ? "แต่ยังคงความเป็นกันเอง" : ""}
-Objective: ${objective}
-Specific Details to Include: ${details || "ชื่อโรงพยาบาล: " + (rhData.hospitals ? rhData.hospitals.join(", ") : "โรงพยาบาลชั้นนำ")}
-Local Keywords to Use: ${rhData.keywords ? rhData.keywords.slice(0, 3).join(", ") : ""}
-
-Task: สร้างเนื้อหาที่มีโครงสร้างชัดเจน ใช้ตัวอย่างจากชีวิตจริงในพื้นที่ และปิดท้ายด้วย Call-to-Action ที่เหมาะกับ${target}`;
-                
-                // Tuning tips
-                const tuningTips = [
-                    "เพิ่มตัวอย่างกรณีศึกษาเฉพาะพื้นที่เพื่อสร้างความเชื่อมั่น",
-                    "ใช้ภาษาที่เหมาะกับ${tone} แต่ยังคงความเป็นท้องถิ่น",
-                    "เน้นประโยชน์ที่จับต้องได้มากกว่าคำศัพท์ทางเทคนิค",
-                    "ปรับความยาวตามช่องทางสื่อสาร (โซเชียล: สั้นกระชับ, การขาย: ละเอียดครบถ้วน)"
-                ];
-                
-                return {
-                    intentAnalysis,
-                    masterPrompt,
-                    tuningTips,
-                    outputFormat: "1. เกริ่นนำ 2. ปัญหา/ความต้องการ 3. วิธีแก้ไข 4. ประโยชน์ 5. ขั้นตอนต่อไป"
-                };
+                return PROMPT_LIBRARY[category] || [];
+            }
+            
+            static getConversationScripts(type = "all") {
+                if (type === "all") {
+                    return CONVERSATION_SCRIPTS;
+                }
+                return CONVERSATION_SCRIPTS[type] || [];
             }
         }
 
         // --- React-like Components without React ---
-        class MAMAV2 {
+        class MAMAV2NonAI {
             constructor() {
                 this.state = {
-                    apiKey: "",
                     isSetup: false,
-                    userProfile: { agentName: "", rh: "", zone: "" },
+                    userProfile: { rh: "", zone: "" },
                     activeTab: "needs_analysis",
+                    activeSubTab: "input",
                     loading: false,
-                    aiResponse: "",
+                    response: "",
                     error: "",
                     feedback: null,
-                    demoMode: true, // เริ่มต้นด้วย Demo Mode
                     forms: {
-                        needs_analysis: { income: "", expense: "", debt: "", dependents: "", years: "", assets: "" },
-                        ice_breaking: { age: "", job: "", location: "", observation: "" },
-                        objection: { type: "เงินไม่พอ", direct_quote: "" },
-                        simplifier: { plan_name: "", benefits: "", premium: "" },
-                        matchmaker: { goal: "ลดหย่อนภาษี", budget: "" },
-                        closing: { interest_point: "", last_concern: "" },
-                        prompt_designer: { objective: "", target: "", tone: "Professional", details: "" }
+                        needs_analysis: { 
+                            income: "", 
+                            expense: "", 
+                            debt: "", 
+                            dependents: "", 
+                            years: "", 
+                            assets: "",
+                            insurance_existing: "",
+                            insurance_gap: ""
+                        },
+                        ice_breaking: { 
+                            age: "", 
+                            job: "", 
+                            location: "", 
+                            observation: "",
+                            relationship_level: "",
+                            common_interest: ""
+                        },
+                        objection: { 
+                            type: "เงินไม่พอ", 
+                            direct_quote: "",
+                            customer_tone: "",
+                            previous_attempts: ""
+                        },
+                        simplifier: { 
+                            plan_name: "", 
+                            benefits: "", 
+                            premium: "",
+                            competitor_comparison: "",
+                            unique_selling_point: ""
+                        },
+                        matchmaker: { 
+                            goal: "ลดหย่อนภาษี", 
+                            budget: "",
+                            existing_coverage: "",
+                            priority_level: ""
+                        },
+                        closing: { 
+                            interest_point: "", 
+                            last_concern: "",
+                            timeline: "",
+                            decision_maker: ""
+                        },
+                        prompt_library: {
+                            category: "customer_analysis",
+                            custom_objective: "",
+                            custom_target: "",
+                            custom_details: ""
+                        }
+                    },
+                    promptLibrary: {
+                        selectedCategory: "customer_analysis",
+                        selectedPrompt: null,
+                        customPrompt: ""
                     }
                 };
                 
@@ -644,6 +923,16 @@ Task: สร้างเนื้อหาที่มีโครงสร้�
                 }
             }
             
+            handlePromptLibrarySelect(category, promptId = null) {
+                this.setState({
+                    promptLibrary: {
+                        ...this.state.promptLibrary,
+                        selectedCategory: category,
+                        selectedPrompt: promptId
+                    }
+                });
+            }
+            
             calculateRealityCheck() {
                 const f = this.state.forms.needs_analysis;
                 const income = parseFloat(f.income) || 0;
@@ -666,207 +955,259 @@ Task: สร้างเนื้อหาที่มีโครงสร้�
                 }
             }
             
-            // Demo Mode Analysis
-            generateDemoResponse() {
-                const tab = this.state.activeTab;
-                const formData = this.state.forms[tab];
-                const rhData = RH_DATA[this.state.userProfile.rh] || {};
-                const zone = this.state.userProfile.zone;
+            generateResponse() {
+                this.setState({ loading: true, response: "", error: "" });
                 
-                let result;
-                
-                switch(tab) {
-                    case "needs_analysis":
-                        result = DemoAnalysisEngine.analyzeNeeds(formData, rhData, zone);
-                        return `### 🎯 ผลการวิเคราะห์ Protection Gap (DEMO MODE)
+                setTimeout(() => {
+                    try {
+                        const tab = this.state.activeTab;
+                        const formData = this.state.forms[tab];
+                        const rhData = RH_DATA[this.state.userProfile.rh] || {};
+                        const zone = this.state.userProfile.zone;
                         
+                        let result;
+                        let responseHTML = "";
+                        
+                        switch(tab) {
+                            case "needs_analysis":
+                                result = RuleBasedEngine.analyzeNeeds(formData, rhData, zone);
+                                responseHTML = `### 🎯 ผลการวิเคราะห์ Protection Gap
+                                
 **ข้อมูลการวิเคราะห์:**
 - Protection Gap: ${result.gap.toLocaleString()} บาท
 - ระยะเวลาอยู่รอด: ${result.months} เดือน
 - ระดับความเสี่ยง: ${result.riskLevel}
 
 **การเปรียบเทียบในพื้นที่${zone}:**
-ทุนประกันที่ขาด ${result.gap.toLocaleString()} บาท ${result.metaphors ? '(' + result.metaphors + ')' : ''}
+ทุนประกันที่ขาด ${result.gap.toLocaleString()} บาท ${result.metaphor ? '(' + result.metaphor + ')' : ''}
 
 **คำแนะนำเฉพาะบุคคล:**
 ${result.recommendations.map((rec, i) => `${i+1}. ${rec}`).join('\n')}
 
+**แผนดำเนินการ:**
+${result.actionPlan}
+
 **ข้อควรพิจารณาเพิ่มเติม:**
 1. ควรมีเงินสำรองฉุกเฉิน 3-6 เท่าของรายจ่ายเดือน
 2. พิจารณาประกันสุขภาพครอบคลุมโรคร้ายแรง
-3. วางแผนการออมระยะยาวควบคู่กับประกันชีวิต`;
+3. วางแผนการออมระยะยาวควบคู่กับประกันชีวิต
+4. ตรวจสอบความคุ้มครองที่มีอยู่แล้วเป็นประจำ`;
+                                break;
 
-                    case "ice_breaking":
-                        result = DemoAnalysisEngine.analyzeIceBreaking(formData, rhData, zone);
-                        return `### 🗣️ บทสนทนาเปิดใจ 3 รูปแบบ (DEMO MODE)
-                        
-**บริบทพื้นที่:** ${zone} - ${rhData.tone}
+                            case "ice_breaking":
+                                result = RuleBasedEngine.generateIceBreaking(formData, rhData, zone);
+                                responseHTML = `### 🗣️ บทสนทนาเปิดใจ
+                                
+**บริบทพื้นที่:** ${zone} - ${result.tone}
 **สถานที่พบกัน:** ${formData.location || "ร้านกาแฟ"}
 **อายุ/อาชีพ:** ${formData.age || "35-40"} / ${formData.job || "อาชีพทั่วไป"}
+**ระดับความสัมพันธ์:** ${formData.relationship_level || "ใหม่"}
 
-**1. รูปแบบทั่วไป (ทั่วไป):**
+**รูปแบบการเปิดบทสนทนา:**
 ${result.starters[0]}
 
-**2. เชื่อมโยงอาชีพ:**
+**เชื่อมโยงกับอาชีพ:**
 ${result.jobConnection[0]}
 
-**3. Hook เปิดใจ:**
+**Hook เปิดใจ:**
 ${result.hook[0]}
+
+${result.observationApproach ? `**แนวทางจากสิ่งที่สังเกตเห็น:**\n${result.observationApproach}\n` : ''}
 
 **เคล็ดลับสำหรับพื้นที่${zone}:**
 - ใช้ 'Local Common Ground': ${result.commonGround}
-- น้ำเสียง: ${result.tone}
-- เริ่มจากประเด็นใกล้ตัวก่อนเข้าสู่ธุรกิจ`;
+- ${result.tips.join('\n- ')}`;
+                                break;
 
-                    case "objection":
-                        result = DemoAnalysisEngine.handleObjection(formData, rhData, zone);
-                        return `### 🛡️ เทคนิค LSCPA แก้ข้อโต้แย้ง (DEMO MODE)
-                        
+                            case "objection":
+                                result = RuleBasedEngine.handleObjection(formData, rhData, zone);
+                                responseHTML = `### 🛡️ เทคนิค LSCPA แก้ข้อโต้แย้ง
+                                
 **ข้อโต้แย้ง:** ${formData.type}
 **คำพูดลูกค้า:** "${formData.direct_quote || 'ไม่ระบุ'}"
+**น้ำเสียงลูกค้า:** ${formData.customer_tone || 'ไม่ระบุ'}
 
 **เทคนิค:** ${result.technique}
 
-**LSCPA ในพื้นที่${zone}:**
-- **L (Listen):** ${result.lscpa.Listen}
-- **S (Share):** ${result.lscpa.Share}
-- **C (Clarify):** ${result.lscpa.Clarify}
-- **P (Proceed):** ${result.lscpa.Proceed}
-- **A (Ask):** ${result.lscpa.Ask}
+**ขั้นตอน LSCPA:**
+${result.steps.map((step, i) => `${i+1}. ${step}`).join('\n')}
+
+${result.learnFromPrevious ? `**เรียนรู้จากครั้งก่อน:**\n${result.learnFromPrevious}\n` : ''}
 
 **Reframing เทคนิค:**
 ${result.reframing}
 
-**ตัวอย่างในพื้นที่:** ${result.regionalExample}
+${result.toneAdjustment ? `**ปรับน้ำเสียง:** ${result.toneAdjustment}\n` : ''}
 
 **ปิดการสนทนา:**
 ${result.closing}`;
+                                break;
 
-                    case "simplifier":
-                        result = DemoAnalysisEngine.simplifyPlan(formData, rhData, zone);
-                        return `### 💎 3 ประโยคทองคำย่อยแผนประกัน (DEMO MODE)
-                        
+                            case "simplifier":
+                                result = RuleBasedEngine.simplifyPlan(formData, rhData, zone);
+                                responseHTML = `### 💎 3 ประโยคทองคำย่อยแผนประกัน
+                                
 **แผนประกัน:** ${formData.plan_name || "แผนประกันทั่วไป"}
 **เบี้ยประกัน:** ${parseFloat(formData.premium || 0).toLocaleString()} บาท/ปี
 
 **เปรียบเทียบเบี้ยรายวัน:**
 เบี้ยประกัน ${result.dailyCost} บาท/วัน ≈ ${result.localComparison} ใน${zone}
+เบี้ยประกัน ${result.monthlyCost} บาท/เดือน
 
 **3 ประโยคทองคำ:**
-1. ${result.goldenSentences[0]}
-2. ${result.goldenSentences[1]}
-3. ${result.goldenSentences[2]}
+${result.goldenSentences.map((s, i) => `${i+1}. ${s}`).join('\n')}
 
 **สรุปผลประโยชน์หลัก:**
 ${result.benefitSummary.map((b, i) => `${i+1}. ${b}`).join('\n')}
 
-**คำแนะนำการนำเสนอ:**
-- ใช้การเปรียบเทียบกับค่าครองชีพใน${zone}
-- เน้นความคุ้มค่าต่อวันมากกว่าต่อปี
-- ยกตัวอย่างกรณีศึกษาจริงในพื้นที่`;
+**กลยุทธ์การนำเสนอ:**
+${result.competitorStrategy}
 
-                    case "matchmaker":
-                        result = DemoAnalysisEngine.matchProduct(formData, rhData, zone);
-                        return `### 🎯 แผนประกันที่เหมาะกับคุณ (DEMO MODE)
-                        
+**คำแนะนำการนำเสนอ:**
+${result.presentationTips.map((tip, i) => `${i+1}. ${tip}`).join('\n')}`;
+                                break;
+
+                            case "matchmaker":
+                                result = RuleBasedEngine.matchProduct(formData, rhData, zone);
+                                responseHTML = `### 🎯 แผนประกันที่เหมาะกับคุณ
+                                
 **เป้าหมาย:** ${formData.goal}
 **งบประมาณ:** ${parseFloat(formData.budget || 0).toLocaleString()} บาท/ปี
+**ระดับความสำคัญ:** ${formData.priority_level || "ปานกลาง"}
 
 **แผนแนะนำ:** ${result.recommendedProduct.name}
 **ความคุ้มครอง:** ${result.recommendedProduct.coverage}
 **เบี้ยประกัน:** ${result.recommendedProduct.premium} บาท/ปี
+**เหตุผล:** ${result.reason}
 **ความเหมาะสมกับงบ:** ${result.budgetFit}
 
-**เหตุผลสำหรับพื้นที่${zone}:**
-${result.localReason}
-
 **วิเคราะห์สวัสดิการที่มีอยู่:**
-✅ ${result.existingWelfare.join('\n✅ ')}
+${result.existingWelfare.map(w => `✅ ${w}`).join('\n')}
 
 **ส่วนที่ควรเติมเต็ม:**
-➕ ${result.missingCoverage.join('\n➕ ')}
+${result.missingCoverage.map(c => `➕ ${c}`).join('\n')}
 
 **แผนดำเนินการ:**
 ${result.actionPlan}
 
 **ขั้นตอนต่อไป:**
-1. ตรวจสอบคุณสมบัติเบื้องต้น
-2. เปรียบเทียบกับแผนอื่นในงบใกล้เคียง
-3. เริ่มต้นด้วยจำนวนความคุ้มครองที่เหมาะสม`;
+${result.nextSteps.map((step, i) => `${i+1}. ${step}`).join('\n')}`;
+                                break;
 
-                    case "closing":
-                        result = DemoAnalysisEngine.generateClosing(formData, rhData, zone);
-                        return `### ✅ สรุปและปิดการขาย (DEMO MODE)
-                        
+                            case "closing":
+                                result = RuleBasedEngine.generateClosing(formData, rhData, zone);
+                                responseHTML = `### ✅ สรุปและปิดการขาย
+                                
 **จุดสนใจของลูกค้า:** ${formData.interest_point}
 **ข้อกังวลสุดท้าย:** ${formData.last_concern}
+**กรอบเวลา:** ${formData.timeline}
+**ผู้ตัดสินใจ:** ${formData.decision_maker}
 
 **สรุปจุดเด่น:**
-"คุณชอบใน${formData.interest_point} ซึ่งแผนนี้ตอบโจทย์ด้วย..."
+"คุณให้ความสำคัญกับ${formData.interest_point} ซึ่งแผนนี้ตอบโจทย์คุณได้ดีเพราะ..."
 
 **จัดการข้อกังวล:**
 "สำหรับเรื่อง${formData.last_concern} ทางเรามีวิธีแก้โดย..."
+
+**กลยุทธ์ตามกรอบเวลา:**
+${result.timelineStrategy}
+
+**กลยุทธ์ตามผู้ตัดสินใจ:**
+${result.decisionMakerStrategy}
 
 **ความเร่งด่วนเชิงพื้นที่:**
 ${result.urgency}
 
 **เทคนิค Alternative Close:**
-${result.closes.join('\n\n')}
+${result.closes.map((c, i) => `${i+1}. ${c}`).join('\n\n')}
 
 **สร้างความมั่นใจ:**
 ${result.confidenceBuilder}
 
 **ขั้นตอนถัดไป:**
 ${result.nextStep}`;
+                                break;
 
-                    case "prompt_designer":
-                        result = DemoAnalysisEngine.designPrompt(formData, rhData, zone);
-                        return `### 🤖 Master Prompt Design (DEMO MODE)
+                            case "prompt_library":
+                                const category = this.state.promptLibrary.selectedCategory;
+                                const prompts = RuleBasedEngine.getPromptLibrary(category);
+                                const scripts = RuleBasedEngine.getConversationScripts("all");
+                                
+                                if (this.state.activeSubTab === "ready") {
+                                    // Show ready-to-use prompts
+                                    responseHTML = `### 📚 Prompt Library - ${this.getCategoryName(category)}
+                                    
+**Prompt สำเร็จรูปพร้อมใช้:**
+${prompts.map(p => `
+**${p.title}**
+\`\`\`
+${p.prompt}
+\`\`\`
+**หมวดหมู่:** ${p.category} | **แท็ก:** ${p.tags.join(', ')}
+`).join('\n---\n')}
+
+**สคริปต์บทสนทนาพร้อมใช้:**
+${Object.entries(scripts).map(([type, scriptList]) => `
+**${this.getScriptTypeName(type)}**
+${scriptList.map(s => `
+**${s.title}**
+${s.script}
+${s.tips ? `\n**เคล็ดลับ:** ${s.tips.join(', ')}` : ''}
+${s.follow_up ? `\n**ติดตาม:** ${s.follow_up}` : ''}
+${s.technique ? `\n**เทคนิค:** ${s.technique}` : ''}
+${s.key_points ? `\n**จุดสำคัญ:** ${s.key_points.join(', ')}` : ''}
+`).join('\n---\n')}
+`).join('\n')}`;
+                                } else {
+                                    // Show custom prompt form
+                                    responseHTML = `### 🛠️ สร้าง Prompt แบบ Customize
+                                    
+กรุณากรอกข้อมูลด้านซ้ายเพื่อสร้าง Prompt ที่เหมาะกับคุณ`;
+                                }
+                                break;
+
+                            default:
+                                responseHTML = "### ไม่พบข้อมูลสำหรับหมวดหมู่นี้";
+                        }
                         
-**1. วิเคราะห์ความตั้งใจ:**
-${result.intentAnalysis}
-
-**2. Master Prompt:**
-\`\`\`
-${result.masterPrompt}
-\`\`\`
-
-**3. เคล็ดลับการปรับจูน:**
-${result.tuningTips.map((tip, i) => `${i+1}. ${tip}`).join('\n')}
-
-**4. โครงสร้างผลลัพธ์ที่แนะนำ:**
-${result.outputFormat}
-
-**หมายเหตุสำหรับพื้นที่${zone}:**
-- ใช้คำหลัก: ${rhData.keywords ? rhData.keywords.slice(0, 2).join(', ') : 'คำหลักท้องถิ่น'}
-- อ้างอิง: ${rhData.hospitals ? rhData.hospitals[0] : 'โรงพยาบาลในพื้นที่'}
-- เน้น: ${rhData.dynamics ? rhData.dynamics.substring(0, 100) + '...' : 'บริบทท้องถิ่น'}`;
-
-                    default:
-                        return "### DEMO MODE\n\nไม่พบข้อมูลสำหรับหมวดหมู่นี้";
-                }
-            }
-            
-            async handleGenerate() {
-                this.setState({ loading: true, aiResponse: "", error: "" });
-                
-                // ใช้ Demo Mode เป็นหลัก (ตามที่ต้องการ)
-                setTimeout(() => {
-                    try {
-                        const demoResponse = this.generateDemoResponse();
                         this.setState({ 
-                            aiResponse: demoResponse,
-                            loading: false,
-                            demoMode: true
+                            response: responseHTML,
+                            loading: false
                         });
                     } catch (error) {
-                        console.error("Demo mode error:", error);
+                        console.error("Error generating response:", error);
                         this.setState({ 
-                            error: "เกิดข้อผิดพลาดใน Demo Mode: " + error.message,
+                            error: "เกิดข้อผิดพลาดในการวิเคราะห์: " + error.message,
                             loading: false 
                         });
                     }
-                }, 800); // เพิ่ม delay นิดหน่อยให้ดู realistic
+                }, 800);
+            }
+            
+            getCategoryName(category) {
+                const names = {
+                    "customer_analysis": "วิเคราะห์ลูกค้า",
+                    "product_comparison": "เปรียบเทียบผลิตภัณฑ์",
+                    "sales_script": "สคริปต์ขาย",
+                    "objection_handling": "ตอบข้อโต้แย้ง"
+                };
+                return names[category] || category;
+            }
+            
+            getScriptTypeName(type) {
+                const names = {
+                    "ice_breaking": "บทสนทนาเปิดใจ",
+                    "objection_scenarios": "สถานการณ์ตอบข้อโต้แย้ง"
+                };
+                return names[type] || type;
+            }
+            
+            copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('คัดลอกลง Clipboard แล้ว');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
             }
             
             renderInputSection() {
@@ -963,18 +1304,30 @@ ${result.outputFormat}
                                 ${InputWrap("สินทรัพย์เดิม (เงินออม/ทุนประกัน)", 
                                     createInput('needs_analysis', 'assets', f.assets, "0", "number")
                                 )}
-                                <div class="bg-gradient-to-r from-sky-900 to-indigo-900 rounded-xl p-4 text-white shadow-lg">
+                                ${InputWrap("ประกันที่มีอยู่แล้ว", 
+                                    createTextarea('needs_analysis', 'insurance_existing', f.insurance_existing, "ระบุประเภทและวงเงิน", 3)
+                                )}
+                                ${InputWrap("จุดที่รู้สึกว่าคุ้มครองไม่พอ", 
+                                    createTextarea('needs_analysis', 'insurance_gap', f.insurance_gap, "เช่น โรคร้ายแรง, รายได้ทดแทน", 3)
+                                )}
+                                <div class="bg-gradient-to-r from-amber-900 to-orange-900 rounded-xl p-4 text-white shadow-lg">
                                     <div class="flex justify-between items-center text-[11px] opacity-80 mb-1">
                                         <span>ESTIMATED PROTECTION GAP</span>
                                         ${ICONS.alert}
                                     </div>
                                     <div id="protection-gap" class="text-xl font-bold">${gap.toLocaleString()} บาท</div>
-                                    <div class="text-[10px] opacity-60 mt-1">Demo Mode: วิเคราะห์จากข้อมูลจริง</div>
+                                    <div class="text-[10px] opacity-60 mt-1">Rule-based Analysis</div>
                                 </div>
                             </div>
                         `;
                     
                     case "ice_breaking":
+                        const relationshipOptions = {
+                            "ใหม่": "ใหม่ (เพิ่งรู้จัก)",
+                            "พอคุ้นเคย": "พอคุ้นเคย",
+                            "สนิท": "สนิท (รู้จักกันมานาน)"
+                        };
+                        
                         return `
                             <div class="space-y-4 animate-in">
                                 <div class="grid grid-cols-2 gap-3">
@@ -988,8 +1341,14 @@ ${result.outputFormat}
                                 ${InputWrap("สถานที่ที่พบกัน", 
                                     createInput('ice_breaking', 'location', f.location, "เช่น ร้านกาแฟในนิคมฯ")
                                 )}
+                                ${InputWrap("ระดับความสัมพันธ์", 
+                                    createSelect('ice_breaking', 'relationship_level', f.relationship_level, relationshipOptions)
+                                )}
                                 ${InputWrap("สิ่งที่สังเกตเห็น (Insight)", 
                                     createTextarea('ice_breaking', 'observation', f.observation, "เช่น ใส่สมาร์ทวอทช์, ดูรีบไปรับลูก, ถือหนังสือลงทุน", 4)
+                                )}
+                                ${InputWrap("ความสนใจร่วม", 
+                                    createInput('ice_breaking', 'common_interest', f.common_interest, "เช่น กีฬา, การลงทุน, ท่องเที่ยว")
                                 )}
                             </div>
                         `;
@@ -1000,7 +1359,17 @@ ${result.outputFormat}
                             "มีประกันเยอะแล้ว": "มีประกันเยอะแล้ว",
                             "ขอถามแฟน/ครอบครัวก่อน": "ขอถามแฟน/ครอบครัวก่อน",
                             "ประกันโกง/เบิกยาก": "ประกันโกง/เบิกยาก",
-                            "ยังไม่รีบ/ยังแข็งแรง": "ยังไม่รีบ/ยังแข็งแรง"
+                            "ยังไม่รีบ/ยังแข็งแรง": "ยังไม่รีบ/ยังแข็งแรง",
+                            "ไม่ไว้ใจตัวแทน": "ไม่ไว้ใจตัวแทน",
+                            "รอโบนัส/รอเงินก้อน": "รอโบนัส/รอเงินก้อน"
+                        };
+                        
+                        const toneOptions = {
+                            "กังวล": "กังวล",
+                            "ไม่มั่นใจ": "ไม่มั่นใจ",
+                            "สงสัย": "สงสัย",
+                            "ปฏิเสธ": "ปฏิเสธ",
+                            "เหนื่อย": "เหนื่อย"
                         };
                         
                         return `
@@ -1008,16 +1377,28 @@ ${result.outputFormat}
                                 ${InputWrap("ข้อโต้แย้งที่พบ", 
                                     createSelect('objection', 'type', f.type, objectionOptions, "เลือกประเภทข้อโต้แย้ง")
                                 )}
+                                ${InputWrap("น้ำเสียงลูกค้า", 
+                                    createSelect('objection', 'customer_tone', f.customer_tone, toneOptions, "เลือกน้ำเสียง")
+                                )}
                                 ${InputWrap("คำพูดดิบๆ ของลูกค้า (Direct Quote)", 
                                     createTextarea('objection', 'direct_quote', f.direct_quote, "เช่น 'น้องคะ ช่วงนี้พี่ผ่อนบ้านเยอะ ไม่ไหวจริงๆ'", 5)
                                 )}
+                                ${InputWrap("เคยลองแก้ไขอย่างไรแล้ว", 
+                                    createTextarea('objection', 'previous_attempts', f.previous_attempts, "บอกว่าคุ้มครองโรคร้ายแรง, เปรียบเทียบเบี้ยรายวัน", 3)
+                                )}
                                 <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
-                                    <strong>Demo Mode Tip:</strong> ระบบวิเคราะห์จากฐานข้อมูลเทคนิค LSCPA และตัวอย่างในพื้นที่
+                                    <strong>Tip:</strong> ระบบวิเคราะห์จากฐานข้อมูลเทคนิค LSCPA และตัวอย่างในพื้นที่
                                 </div>
                             </div>
                         `;
                     
                     case "simplifier":
+                        const competitorOptions = {
+                            "รู้จักชื่อคู่แข่ง": "รู้จักชื่อคู่แข่ง",
+                            "ไม่รู้จัก": "ไม่รู้จัก",
+                            "เคยได้ยิน": "เคยได้ยิน"
+                        };
+                        
                         return `
                             <div class="space-y-4">
                                 ${InputWrap("ชื่อแผนประกัน", 
@@ -1029,6 +1410,12 @@ ${result.outputFormat}
                                 ${InputWrap("ผลประโยชน์หลัก (ระบุ 3-5 ข้อ)", 
                                     createTextarea('simplifier', 'benefits', f.benefits, "1. คุ้มครองผู้ป่วยใน...\\n2. เหมาจ่ายค่ารักษา...", 5)
                                 )}
+                                ${InputWrap("รู้จักคู่แข่งหรือไม่", 
+                                    createSelect('simplifier', 'competitor_comparison', f.competitor_comparison, competitorOptions)
+                                )}
+                                ${InputWrap("จุดเด่นที่อยากเน้น", 
+                                    createTextarea('simplifier', 'unique_selling_point', f.unique_selling_point, "เช่น จ่ายง่าย, เงื่อนไขน้อย, ความคุ้มครองครบ", 3)
+                                )}
                             </div>
                         `;
                     
@@ -1037,7 +1424,15 @@ ${result.outputFormat}
                             "ลดหย่อนภาษี": "ลดหย่อนภาษี",
                             "มรดกให้ลูกหลาน": "มรดกให้ลูกหลาน",
                             "ค่ารักษาพยาบาล (สุขภาพ)": "ค่ารักษาพยาบาล (สุขภาพ)",
-                            "เงินออม/เกษียณ": "เงินออม/เกษียณ"
+                            "เงินออม/เกษียณ": "เงินออม/เกษียณ",
+                            "รายได้ทดแทน": "รายได้ทดแทน",
+                            "โรคร้ายแรง": "โรคร้ายแรง"
+                        };
+                        
+                        const priorityOptions = {
+                            "สูง": "สูง (เร่งด่วน)",
+                            "ปานกลาง": "ปานกลาง",
+                            "ต่ำ": "ต่ำ (วางแผนล่วงหน้า)"
                         };
                         
                         return `
@@ -1048,14 +1443,27 @@ ${result.outputFormat}
                                 ${InputWrap("งบประมาณที่ชำระได้สะดวก (ต่อปี)", 
                                     createInput('matchmaker', 'budget', f.budget, "เช่น 30,000", "number")
                                 )}
-                                <div class="p-3 bg-gradient-to-r from-sky-50 to-indigo-50 rounded-xl border border-sky-100 flex items-start gap-3">
+                                ${InputWrap("ความคุ้มครองที่มีอยู่แล้ว", 
+                                    createTextarea('matchmaker', 'existing_coverage', f.existing_coverage, "เช่น ประกันสังคม, ประกันกลุ่มบริษัท", 3)
+                                )}
+                                ${InputWrap("ระดับความสำคัญ", 
+                                    createSelect('matchmaker', 'priority_level', f.priority_level, priorityOptions)
+                                )}
+                                <div class="p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100 flex items-start gap-3">
                                     ${ICONS.zap}
-                                    <p class="text-xs text-sky-800 leading-relaxed">MAMA จะแนะนำแผนโดยอ้างอิงสวัสดิการพื้นฐานของคนในโซน <b>${this.state.userProfile.zone}</b> เป็นหลัก</p>
+                                    <p class="text-xs text-amber-800 leading-relaxed">ระบบจะแนะนำแผนโดยอ้างอิงสวัสดิการพื้นฐานของคนในโซน <b>${this.state.userProfile.zone}</b> เป็นหลัก</p>
                                 </div>
                             </div>
                         `;
                     
                     case "closing":
+                        const timelineOptions = {
+                            "ภายในสัปดาห์นี้": "ภายในสัปดาห์นี้",
+                            "ภายในเดือนนี้": "ภายในเดือนนี้",
+                            "ยังไม่แน่ใจ": "ยังไม่แน่ใจ",
+                            "วางแผนล่วงหน้า": "วางแผนล่วงหน้า"
+                        };
+                        
                         return `
                             <div class="space-y-4">
                                 ${InputWrap("จุดที่ลูกค้าดูสนใจมากที่สุด", 
@@ -1064,30 +1472,75 @@ ${result.outputFormat}
                                 ${InputWrap("ข้อกังวลสุดท้ายที่ลูกค้าลังเล", 
                                     createTextarea('closing', 'last_concern', f.last_concern, "เช่น กลัวอนาคตส่งไม่ไหว", 5)
                                 )}
+                                ${InputWrap("กรอบเวลาที่ลูกค้าบอก", 
+                                    createSelect('closing', 'timeline', f.timeline, timelineOptions)
+                                )}
+                                ${InputWrap("ผู้มีส่วนร่วมตัดสินใจ", 
+                                    createInput('closing', 'decision_maker', f.decision_maker, "เช่น ตัวเอง, คู่สมรส, ผู้ปกครอง")
+                                )}
                             </div>
                         `;
                     
-                    case "prompt_designer":
-                        const toneOptions = {
-                            "Professional": "Professional",
-                            "อบอุ่น/เป็นกันเอง": "อบอุ่น/เป็นกันเอง",
-                            "กระตุ้นให้ตระหนักถึงความเสี่ยง": "กระตุ้นให้ตระหนักถึงความเสี่ยง"
+                    case "prompt_library":
+                        const promptCategories = {
+                            "customer_analysis": "วิเคราะห์ลูกค้า",
+                            "product_comparison": "เปรียบเทียบผลิตภัณฑ์",
+                            "sales_script": "สคริปต์ขาย",
+                            "objection_handling": "ตอบข้อโต้แย้ง"
                         };
+                        
+                        const currentCategory = this.state.promptLibrary.selectedCategory;
                         
                         return `
                             <div class="space-y-4">
-                                ${InputWrap("เป้าหมายของคำสั่ง (Objective)", 
-                                    createInput('prompt_designer', 'objective', f.objective, "เช่น เขียนโพสต์ Facebook ขายประกันสุขภาพ")
-                                )}
-                                ${InputWrap("กลุ่มเป้าหมาย (Target)", 
-                                    createInput('prompt_designer', 'target', f.target, "เช่น เจ้าของสวนยางในกระบี่")
-                                )}
-                                ${InputWrap("อารมณ์ที่ต้องการ", 
-                                    createSelect('prompt_designer', 'tone', f.tone, toneOptions, "เลือกอารมณ์")
-                                )}
-                                ${InputWrap("ข้อมูลเฉพาะที่ต้องใส่", 
-                                    createTextarea('prompt_designer', 'details', f.details, "ชื่อโรงพยาบาล, ชื่อแผนประกัน...", 4)
-                                )}
+                                <div class="flex space-x-2 mb-4">
+                                    <button onclick="app.setState({ activeSubTab: 'ready' })" class="flex-1 py-2 px-4 rounded-lg ${this.state.activeSubTab === 'ready' ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white' : 'bg-slate-100 text-slate-600'} font-medium">
+                                        Prompt สำเร็จรูป
+                                    </button>
+                                    <button onclick="app.setState({ activeSubTab: 'custom' })" class="flex-1 py-2 px-4 rounded-lg ${this.state.activeSubTab === 'custom' ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white' : 'bg-slate-100 text-slate-600'} font-medium">
+                                        สร้าง Prompt
+                                    </button>
+                                </div>
+                                
+                                ${this.state.activeSubTab === 'ready' ? `
+                                    ${InputWrap("เลือกหมวดหมู่", 
+                                        createSelect('prompt_library', 'category', currentCategory, promptCategories)
+                                    )}
+                                    
+                                    <div class="mt-6">
+                                        <h4 class="text-sm font-bold text-slate-700 mb-3">📖 Prompt Library</h4>
+                                        <div class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
+                                            ${RuleBasedEngine.getPromptLibrary(currentCategory).map(prompt => `
+                                                <div class="p-3 bg-slate-50 border rounded-lg hover:bg-amber-50 cursor-pointer" onclick="app.copyToClipboard('${prompt.prompt.replace(/'/g, "\\'")}')">
+                                                    <div class="font-bold text-slate-800 text-sm">${prompt.title}</div>
+                                                    <div class="text-xs text-slate-600 mt-1 truncate">${prompt.prompt.substring(0, 80)}...</div>
+                                                    <div class="flex items-center gap-2 mt-2">
+                                                        <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded">${prompt.category}</span>
+                                                        ${prompt.tags.map(tag => `
+                                                            <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded">${tag}</span>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                ` : `
+                                    ${InputWrap("วัตถุประสงค์", 
+                                        createInput('prompt_library', 'custom_objective', f.custom_objective, "เช่น สร้างบทสนทนาแนะนำประกันสุขภาพ")
+                                    )}
+                                    ${InputWrap("กลุ่มเป้าหมาย", 
+                                        createInput('prompt_library', 'custom_target', f.custom_target, "เช่น เจ้าของสวนยางในกระบี่")
+                                    )}
+                                    ${InputWrap("รายละเอียดที่ต้องการ", 
+                                        createTextarea('prompt_library', 'custom_details', f.custom_details, "ชื่อโรงพยาบาล, ชื่อแผนประกัน, เป้าหมายเฉพาะ...", 4)
+                                    )}
+                                    
+                                    <div class="p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100">
+                                        <p class="text-xs text-amber-800">
+                                            <strong>Tip:</strong> Prompt ที่ดีควรระบุ Role, Task, Context และ Output format ให้ชัดเจน
+                                        </p>
+                                    </div>
+                                `}
                             </div>
                         `;
                     
@@ -1098,12 +1551,12 @@ ${result.outputFormat}
             
             renderSetupPage() {
                 const rhOptions = Object.keys(RH_DATA).map(rh => 
-                    `<option value="${rh}">${rh}</option>`
+                    `<option value="${rh}" ${this.state.userProfile.rh === rh ? 'selected' : ''}>${rh}</option>`
                 ).join('');
                 
                 const zoneOptions = this.state.userProfile.rh 
                     ? ZONES[this.state.userProfile.rh].map(z => 
-                        `<option value="${z}">${z}</option>`
+                        `<option value="${z}" ${this.state.userProfile.zone === z ? 'selected' : ''}>${z}</option>`
                       ).join('')
                     : '';
                 
@@ -1115,34 +1568,25 @@ ${result.outputFormat}
                             </div>
                             
                             <div class="flex flex-col items-center mb-6 relative">
-                                <div class="w-16 h-16 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mb-4 shadow-xl">
+                                <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center text-white mb-4 shadow-xl">
                                     ${ICONS.sparkles.replace('icon-warning', 'text-white')}
                                 </div>
                                 <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">MAMA V.2</h1>
-                                <p class="text-[10px] bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent font-bold tracking-[0.2em] uppercase mt-1">AI Sale Assistant</p>
-                                <div class="demo-badge mt-2">
-                                    ${ICONS.demoBadge} DEMO MODE
+                                <p class="text-[10px] bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-bold tracking-[0.2em] uppercase mt-1">Sale Assistant</p>
+                                <div class="orange-badge mt-2">
+                                    ${ICONS.library} RULE-BASED SYSTEM
                                 </div>
                             </div>
                             
                             <div class="space-y-4">
-                                <div>
-                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">AGENT NAME</label>
-                                    <input type="text" 
-                                        id="agent-name-input"
-                                        value="${this.state.userProfile.agentName}" 
-                                        oninput="app.setState({ userProfile: { ...app.state.userProfile, agentName: this.value } })"
-                                        placeholder="ชื่อตัวแทน..." 
-                                        class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-sky-500 outline-none transition-all text-base">
-                                </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">REGION (RH)</label>
                                         <select 
                                             id="rh-select"
                                             value="${this.state.userProfile.rh}" 
-                                            onchange="app.setState({ userProfile: { ...app.state.userProfile, rh: this.value, zone: '' } })"
-                                            class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-sky-500 outline-none text-base">
+                                            onchange="app.setState({ userProfile: { ...app.state.userProfile, rh: this.value } })"
+                                            class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-amber-500 outline-none text-base">
                                             <option value="">เลือก RH</option>
                                             ${rhOptions}
                                         </select>
@@ -1154,7 +1598,7 @@ ${result.outputFormat}
                                             value="${this.state.userProfile.zone}" 
                                             onchange="app.setState({ userProfile: { ...app.state.userProfile, zone: this.value } })"
                                             ${!this.state.userProfile.rh ? 'disabled' : ''}
-                                            class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-sky-500 outline-none text-base ${!this.state.userProfile.rh ? 'bg-slate-50' : ''}">
+                                            class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-amber-500 outline-none text-base ${!this.state.userProfile.rh ? 'bg-slate-50' : ''}">
                                             <option value="">เลือกโซน</option>
                                             ${zoneOptions}
                                         </select>
@@ -1163,18 +1607,18 @@ ${result.outputFormat}
                                 
                                 <div class="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
                                     <div class="flex items-center gap-2 mb-2">
-                                        ${ICONS.demoBadge}
-                                        <span class="font-bold text-amber-800">DEMO MODE เปิดใช้งาน</span>
+                                        ${ICONS.lightbulb}
+                                        <span class="font-bold text-amber-800">ระบบ Rule-based</span>
                                     </div>
                                     <p class="text-xs text-amber-700">
-                                        ระบบวิเคราะห์ด้วยกฎและเงื่อนไขในตัวระบบ โดยไม่ต้องใช้ API Key
+                                        ระบบวิเคราะห์ด้วยกฎและฐานข้อมูลในระบบ โดยไม่ต้องใช้ AI เหมาะสำหรับผู้ที่ต้องการคำแนะนำจากฐานข้อมูลและประสบการณ์จริง
                                     </p>
                                 </div>
                                 
                                 <button 
-                                    onclick="if(app.state.userProfile.agentName && app.state.userProfile.zone) app.setState({ isSetup: true }); else alert('กรุณากรอกชื่อตัวแทนและเลือกโซนให้ครบ')"
-                                    class="w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl transition-all mt-2 flex items-center justify-center gap-2 shadow-lg shadow-sky-900/20 active:scale-95 transform transition-transform">
-                                    Start Demo ${ICONS.chevronRight}
+                                    onclick="if(app.state.userProfile.zone) app.setState({ isSetup: true }); else alert('กรุณาเลือกโซนให้ครบ')"
+                                    class="w-full bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-bold py-4 rounded-xl transition-all mt-2 flex items-center justify-center gap-2 shadow-lg shadow-amber-900/20 active:scale-95 transform transition-transform">
+                                    เริ่มใช้งานระบบ ${ICONS.chevronRight}
                                 </button>
                             </div>
                         </div>
@@ -1190,7 +1634,7 @@ ${result.outputFormat}
                     { id: 'simplifier', label: '4. ย่อยผลประโยชน์', icon: ICONS.gift },
                     { id: 'matchmaker', label: '5. เลือกผลิตภัณฑ์', icon: ICONS.bag },
                     { id: 'closing', label: '6. สรุปและปิดการขาย', icon: ICONS.file },
-                    { id: 'prompt_designer', label: '7. Prompt Designer', icon: ICONS.terminal },
+                    { id: 'prompt_library', label: '7. Prompt Library', icon: ICONS.library },
                 ];
                 
                 const rh = RH_DATA[this.state.userProfile.rh] || {};
@@ -1201,11 +1645,11 @@ ${result.outputFormat}
                         <!-- Sidebar -->
                         <aside class="w-full md:w-72 bg-gradient-to-b from-slate-900 to-slate-950 text-white flex flex-col flex-shrink-0 z-30 shadow-2xl">
                             <div class="p-4 md:p-6 border-b border-white/5 flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center text-white">
+                                <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center text-white">
                                     ${ICONS.sparkles.replace('icon-warning', 'text-white')}
                                 </div>
                                 <div>
-                                    <span class="font-black text-xl block leading-none">MAMA <span class="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">V.2</span></span>
+                                    <span class="font-black text-xl block leading-none">MAMA <span class="bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">V.2</span></span>
                                     <span class="text-[8px] text-slate-500 font-bold tracking-[0.2em]">PRU ACADEMY [ttb]</span>
                                 </div>
                             </div>
@@ -1213,8 +1657,8 @@ ${result.outputFormat}
                             <div class="flex-1 overflow-y-auto p-3 md:p-4 space-y-1.5 custom-scrollbar">
                                 ${tabs.map(tab => `
                                     <button
-                                        onclick="app.setState({ activeTab: '${tab.id}', aiResponse: '' })"
-                                        class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all group ${this.state.activeTab === tab.id ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/5 hover:text-white'}">
+                                        onclick="app.setState({ activeTab: '${tab.id}', response: '', activeSubTab: 'input' })"
+                                        class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all group ${this.state.activeTab === tab.id ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/5 hover:text-white'}">
                                         ${tab.icon}
                                         <span class="text-[13px] font-bold">${tab.label}</span>
                                     </button>
@@ -1229,9 +1673,9 @@ ${result.outputFormat}
                                     <div class="text-xs font-bold mb-1 truncate">${rh.name || 'กรุณาเลือกภูมิภาค'}</div>
                                     <div class="text-[10px] text-slate-400 italic">"${rh.tone || 'เลือกภูมิภาคเพื่อดูรายละเอียด'}"</div>
                                     <div class="mt-2 text-[9px] bg-gradient-to-r from-amber-900 to-orange-900 text-amber-200 px-2 py-1 rounded-full inline-flex items-center gap-1">
-                                        ${ICONS.demoBadge} DEMO MODE
+                                        ${ICONS.library} RULE-BASED
                                     </div>
-                                    <button onclick="app.setState({ isSetup: false })" class="absolute top-2 right-2 text-slate-600 hover:text-sky-400">
+                                    <button onclick="app.setState({ isSetup: false })" class="absolute top-2 right-2 text-slate-600 hover:text-amber-400">
                                         ${ICONS.rotate}
                                     </button>
                                 </div>
@@ -1246,9 +1690,10 @@ ${result.outputFormat}
                                     <div class="flex items-center gap-3">
                                         <h2 class="text-lg md:text-xl font-black text-slate-800">
                                             ${this.state.activeTab.replace('_', ' ').toUpperCase()}
+                                            ${this.state.activeTab === 'prompt_library' ? ` (${this.state.activeSubTab === 'ready' ? 'สำเร็จรูป' : 'สร้างเอง'})` : ''}
                                         </h2>
-                                        <div class="demo-badge text-xs">
-                                            ${ICONS.demoBadge} DEMO
+                                        <div class="orange-badge text-xs">
+                                            ${ICONS.library} RULE-BASED
                                         </div>
                                     </div>
                                     <div class="flex gap-2 mt-1">
@@ -1257,24 +1702,26 @@ ${result.outputFormat}
                                         `).join('') : ''}
                                     </div>
                                 </div>
+                                ${this.state.activeTab !== 'prompt_library' || this.state.activeSubTab !== 'ready' ? `
                                 <button 
-                                    onclick="app.handleGenerate()"
+                                    onclick="app.generateResponse()"
                                     ${this.state.loading ? 'disabled' : ''}
-                                    class="px-4 md:px-8 py-2 md:py-3 rounded-xl font-black transition-all flex items-center gap-2 shadow-xl ${this.state.loading ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white hover:from-sky-700 hover:to-indigo-700 shadow-sky-900/10 active:scale-95 transform transition-transform'}"
+                                    class="px-4 md:px-8 py-2 md:py-3 rounded-xl font-black transition-all flex items-center gap-2 shadow-xl ${this.state.loading ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-gradient-to-r from-amber-600 to-orange-600 text-white hover:from-amber-700 hover:to-orange-700 shadow-amber-900/10 active:scale-95 transform transition-transform'}"
                                     style="min-width: 140px;">
                                     ${this.state.loading ? 
                                         '<i class="fas fa-spinner fa-spin"></i>' : 
                                         ICONS.sparkles.replace('icon-warning', 'text-white')}
-                                    <span class="hidden md:inline">${this.state.loading ? 'วิเคราะห์...' : 'วิเคราะห์ (Demo)'}</span>
+                                    <span class="hidden md:inline">${this.state.loading ? 'วิเคราะห์...' : 'วิเคราะห์'}</span>
                                     <span class="md:hidden">${this.state.loading ? '...' : 'วิเคราะห์'}</span>
                                 </button>
+                                ` : ''}
                             </header>
                             
                             <div class="flex-1 flex overflow-hidden">
                                 <!-- Left: Input Panel -->
                                 <div class="w-full md:w-80 bg-white border-r overflow-y-auto p-4 md:p-6 flex-shrink-0 custom-scrollbar">
                                     <div class="mb-6 flex items-center justify-between">
-                                        <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-widest">Client Inputs</h4>
+                                        <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-widest">Inputs</h4>
                                         ${ICONS.trending}
                                     </div>
                                     <div id="input-section">
@@ -1283,7 +1730,7 @@ ${result.outputFormat}
                                     
                                     <!-- Region Insights -->
                                     <div class="mt-8 pt-8 border-t space-y-4">
-                                        <div class="flex items-center gap-2 bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">
+                                        <div class="flex items-center gap-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
                                             ${ICONS.building}
                                             <span class="text-[11px] font-black uppercase tracking-wider">Local Insight</span>
                                         </div>
@@ -1291,7 +1738,7 @@ ${result.outputFormat}
                                             <p class="text-sm text-slate-600 leading-relaxed italic">"${rh.dynamics || 'กรุณาเลือกภูมิภาค'}"</p>
                                         </div>
                                         <div class="space-y-2">
-                                            <div class="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                                            <div class="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                                                 ${ICONS.stethoscope}
                                                 <span class="text-[11px] font-black uppercase tracking-wider">Top Hospitals</span>
                                             </div>
@@ -1315,22 +1762,131 @@ ${result.outputFormat}
             }
             
             renderOutputPanel() {
-                if (!this.state.aiResponse) {
+                if (!this.state.response && this.state.activeTab !== 'prompt_library') {
                     return `
                         <div class="h-full flex flex-col items-center justify-center opacity-20 select-none px-6 md:px-12 text-center py-12">
                             <div class="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full flex items-center justify-center mb-6 shadow-inner">
                                 ${ICONS.sparkles.replace('icon-warning', 'text-slate-400')}
                             </div>
-                            <h3 class="text-xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-slate-400 to-slate-600 bg-clip-text text-transparent">MAMA DEMO READY</h3>
+                            <h3 class="text-xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-slate-400 to-slate-600 bg-clip-text text-transparent">MAMA READY</h3>
                             <p class="mt-2 text-slate-500 max-w-sm text-sm md:text-base">
-                                กรอกข้อมูลในช่อง Input ทางซ้าย แล้วกด "วิเคราะห์ (Demo)"<br>
-                                <span class="text-xs text-amber-600 font-bold mt-2 inline-block">ระบบวิเคราะห์ด้วยกฎและเงื่อนไขในตัว</span>
+                                กรอกข้อมูลในช่อง Input ทางซ้าย แล้วกด "วิเคราะห์"<br>
+                                <span class="text-xs text-amber-600 font-bold mt-2 inline-block">ระบบวิเคราะห์ด้วยกฎและฐานข้อมูลในระบบ</span>
                             </p>
                             ${this.state.error ? `
                                 <div class="mt-8 p-4 bg-red-50 text-red-600 border border-red-200 rounded-2xl text-xs font-bold w-full max-w-md">
                                     ${this.state.error}
                                 </div>
                             ` : ''}
+                        </div>
+                    `;
+                }
+                
+                // For prompt library ready tab
+                if (this.state.activeTab === 'prompt_library' && this.state.activeSubTab === 'ready') {
+                    const category = this.state.promptLibrary.selectedCategory;
+                    const prompts = RuleBasedEngine.getPromptLibrary(category);
+                    const scripts = RuleBasedEngine.getConversationScripts("all");
+                    
+                    return `
+                        <div class="max-w-3xl mx-auto p-4 md:p-8 lg:p-12 pb-20 md:pb-32 slide-in-from-bottom">
+                            <!-- Header -->
+                            <div class="mb-6 flex justify-center">
+                                <div class="orange-badge text-sm">
+                                    ${ICONS.library} PROMPT LIBRARY - ${this.getCategoryName(category).toUpperCase()}
+                                </div>
+                            </div>
+                            
+                            <!-- Prompt Library Content -->
+                            <div class="space-y-8">
+                                <!-- Ready-to-use Prompts -->
+                                <div>
+                                    <h3 class="text-lg font-black text-slate-900 mb-4 flex items-center gap-2 border-l-4 border-amber-500 pl-4">
+                                        ${ICONS.copy} Prompt สำเร็จรูปพร้อมใช้
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        ${prompts.map(prompt => `
+                                            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+                                                <div class="flex justify-between items-start mb-3">
+                                                    <h4 class="font-bold text-slate-800">${prompt.title}</h4>
+                                                    <button onclick="app.copyToClipboard('${prompt.prompt.replace(/'/g, "\\'")}')" class="text-amber-600 hover:text-amber-800">
+                                                        ${ICONS.copy}
+                                                    </button>
+                                                </div>
+                                                <div class="bg-slate-50 p-3 rounded-lg font-mono text-sm text-slate-700 mb-3">
+                                                    ${prompt.prompt}
+                                                </div>
+                                                <div class="flex flex-wrap gap-1.5">
+                                                    <span class="text-[10px] bg-slate-100 text-slate-700 px-2 py-1 rounded">${prompt.category}</span>
+                                                    ${prompt.tags.map(tag => `
+                                                        <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-1 rounded">${tag}</span>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                
+                                <!-- Conversation Scripts -->
+                                ${Object.entries(scripts).map(([type, scriptList]) => `
+                                    <div>
+                                        <h3 class="text-lg font-black text-slate-900 mb-4 flex items-center gap-2 border-l-4 border-orange-500 pl-4">
+                                            ${ICONS.script} ${this.getScriptTypeName(type)}
+                                        </h3>
+                                        <div class="space-y-4">
+                                            ${scriptList.map(script => `
+                                                <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                                                    <div class="flex justify-between items-start mb-3">
+                                                        <h4 class="font-bold text-slate-800">${script.title}</h4>
+                                                        <button onclick="app.copyToCliptext('${script.script.replace(/'/g, "\\'")}')" class="text-orange-600 hover:text-orange-800">
+                                                            ${ICONS.copy}
+                                                        </button>
+                                                    </div>
+                                                    <div class="bg-amber-50 p-4 rounded-lg mb-3">
+                                                        <div class="text-sm text-slate-700 whitespace-pre-line">${script.script}</div>
+                                                    </div>
+                                                    ${script.tips ? `
+                                                        <div class="mb-2">
+                                                            <span class="text-xs font-bold text-slate-600">เคล็ดลับ:</span>
+                                                            <div class="text-xs text-slate-600 mt-1">${script.tips.join(', ')}</div>
+                                                        </div>
+                                                    ` : ''}
+                                                    ${script.follow_up ? `
+                                                        <div class="mb-2">
+                                                            <span class="text-xs font-bold text-slate-600">ติดตาม:</span>
+                                                            <div class="text-xs text-slate-600 mt-1">${script.follow_up}</div>
+                                                        </div>
+                                                    ` : ''}
+                                                    ${script.technique ? `
+                                                        <div class="mb-2">
+                                                            <span class="text-xs font-bold text-slate-600">เทคนิค:</span>
+                                                            <div class="text-xs text-slate-600 mt-1">${script.technique}</div>
+                                                        </div>
+                                                    ` : ''}
+                                                    ${script.key_points ? `
+                                                        <div class="mb-2">
+                                                            <span class="text-xs font-bold text-slate-600">จุดสำคัญ:</span>
+                                                            <div class="text-xs text-slate-600 mt-1">${script.key_points.join(', ')}</div>
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <!-- Footer Note -->
+                            <div class="mt-8 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
+                                <div class="flex items-center gap-2 mb-2">
+                                    ${ICONS.lightbulb}
+                                    <span class="font-bold text-amber-800">คำแนะนำการใช้งาน</span>
+                                </div>
+                                <p class="text-xs text-amber-700">
+                                    คลิกที่ไอคอน Copy เพื่อคัดลอก Prompt หรือสคริปต์ไปใช้งานได้ทันที
+                                    หรือไปที่แท็บ "สร้าง Prompt" เพื่อออกแบบ Prompt ที่เหมาะกับความต้องการเฉพาะของคุณ
+                                </p>
+                            </div>
                         </div>
                     `;
                 }
@@ -1342,8 +1898,8 @@ ${result.outputFormat}
                         .replace(/\n/g, '<br>')
                         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-900">$1</strong>')
                         .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                        .replace(/### (.*?)(<br>|$)/g, '<h3 class="text-lg font-black text-slate-900 mt-6 mb-3 flex items-center gap-2 border-l-4 border-sky-500 pl-4">$1</h3>')
-                        .replace(/- (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 flex items-start"><span class="text-sky-500 mr-2">•</span> $1</li>')
+                        .replace(/### (.*?)(<br>|$)/g, '<h3 class="text-lg font-black text-slate-900 mt-6 mb-3 flex items-center gap-2 border-l-4 border-amber-500 pl-4">$1</h3>')
+                        .replace(/- (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 flex items-start"><span class="text-amber-500 mr-2">•</span> $1</li>')
                         .replace(/`(.*?)`/g, '<code class="bg-slate-100 text-slate-700 px-2 py-1 rounded font-mono text-sm">$1</code>')
                         .replace(/\+\+ (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 flex items-start"><span class="text-emerald-500 mr-2">+</span> $1</li>')
                         .replace(/✅ (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 flex items-start"><span class="text-emerald-500 mr-2">✓</span> $1</li>')
@@ -1352,43 +1908,44 @@ ${result.outputFormat}
                 
                 return `
                     <div class="max-w-3xl mx-auto p-4 md:p-8 lg:p-12 pb-20 md:pb-32 slide-in-from-bottom">
-                        <!-- Demo Mode Badge -->
+                        <!-- Rule-based Badge -->
                         <div class="mb-6 flex justify-center">
-                            <div class="demo-badge text-sm">
-                                ${ICONS.demoBadge} DEMO MODE ANALYSIS
+                            <div class="orange-badge text-sm">
+                                ${ICONS.library} RULE-BASED ANALYSIS
                             </div>
                         </div>
                         
                         <!-- Result Wrapper -->
                         <div class="bg-white rounded-2xl md:rounded-[2rem] shadow-2xl shadow-slate-200 overflow-hidden border border-white">
                             <!-- Result Header -->
-                            <div class="bg-gradient-to-r from-sky-600 to-indigo-600 px-6 md:px-10 py-4 md:py-6 text-white flex justify-between items-center">
+                            <div class="bg-gradient-to-r from-amber-600 to-orange-600 px-6 md:px-10 py-4 md:py-6 text-white flex justify-between items-center">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                                         ${ICONS.lightbulb.replace('icon-warning', 'text-white')}
                                     </div>
                                     <div>
-                                        <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.2em]">ANALYSIS RESULT</div>
+                                        <div class="text-[10px] font-bold text-amber-300 uppercase tracking-[0.2em]">ANALYSIS RESULT</div>
                                         <div class="text-sm font-bold opacity-90">${this.state.activeTab.replace('_', ' ').toUpperCase()}</div>
                                     </div>
                                 </div>
-                                <button onclick="navigator.clipboard.writeText('${this.state.aiResponse.replace(/'/g, "\\'")}'); alert('คัดลอกลง Clipboard แล้ว');" class="w-8 h-8 md:w-10 md:h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-colors backdrop-blur-sm">
+                                <button onclick="app.copyToClipboard('${this.state.response.replace(/'/g, "\\'").replace(/\n/g, '\\n')}'); alert('คัดลอกลง Clipboard แล้ว');" class="w-8 h-8 md:w-10 md:h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-colors backdrop-blur-sm">
                                     ${ICONS.copy.replace('icon-gray', 'text-white')}
                                 </button>
                             </div>
                             
                             <!-- Result Content -->
                             <div class="p-6 md:p-10 text-slate-700 leading-relaxed text-sm md:text-base overflow-wrap-break">
-                                ${formatResponse(this.state.aiResponse)}
+                                ${formatResponse(this.state.response)}
                                 
-                                <!-- Demo Mode Disclaimer -->
+                                <!-- Rule-based Disclaimer -->
                                 <div class="mt-8 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
                                     <div class="flex items-center gap-2 mb-2">
-                                        ${ICONS.demoBadge}
-                                        <span class="font-bold text-amber-800">หมายเหตุ Demo Mode</span>
+                                        ${ICONS.library}
+                                        <span class="font-bold text-amber-800">หมายเหตุระบบ Rule-based</span>
                                     </div>
                                     <p class="text-xs text-amber-700">
-                                        ผลการวิเคราะห์นี้สร้างจากกฎและเงื่อนไขที่กำหนดไว้ในระบบ โดยอ้างอิงข้อมูลพื้นที่ ${this.state.userProfile.zone} และฐานข้อมูลผลิตภัณฑ์ประกัน
+                                        ผลการวิเคราะห์นี้สร้างจากกฎและฐานข้อมูลที่กำหนดไว้ในระบบ โดยอ้างอิงข้อมูลพื้นที่ ${this.state.userProfile.zone} และฐานข้อมูลผลิตภัณฑ์ประกัน
+                                        ระบบนี้ไม่ใช้ AI ในการประมวลผล แต่ใช้กฎและเงื่อนไขจากประสบการณ์จริง
                                     </p>
                                 </div>
                             </div>
@@ -1414,6 +1971,9 @@ ${result.outputFormat}
                             </button>
                             <button class="bg-white border text-slate-600 px-4 md:px-6 py-2 md:py-3 rounded-xl text-xs font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm">
                                 ${ICONS.save} <span class="hidden md:inline">บันทึกเคส</span>
+                            </button>
+                            <button class="bg-white border text-slate-600 px-4 md:px-6 py-2 md:py-3 rounded-xl text-xs font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm">
+                                ${ICONS.download} <span class="hidden md:inline">ดาวน์โหลด PDF</span>
                             </button>
                         </div>
                     </div>
@@ -1442,7 +2002,7 @@ ${result.outputFormat}
                             <div class="bg-white p-8 rounded-2xl shadow-lg max-w-md">
                                 <h1 class="text-2xl font-bold text-red-600 mb-4">เกิดข้อผิดพลาด</h1>
                                 <p class="text-slate-600 mb-4">ระบบไม่สามารถแสดงผลได้ กรุณารีเฟรชหน้าเว็บ</p>
-                                <button onclick="location.reload()" class="w-full bg-sky-600 text-white py-3 rounded-lg font-bold">
+                                <button onclick="location.reload()" class="w-full bg-amber-600 text-white py-3 rounded-lg font-bold">
                                     รีเฟรชหน้าเว็บ
                                 </button>
                             </div>
@@ -1469,10 +2029,10 @@ ${result.outputFormat}
             init() {
                 // ตั้งค่า state เริ่มต้นจาก localStorage
                 try {
-                    const savedState = localStorage.getItem('mama_state');
+                    const savedState = localStorage.getItem('mama_nonai_state');
                     if (savedState) {
                         const parsed = JSON.parse(savedState);
-                        this.setState({ ...parsed, demoMode: true });
+                        this.setState({ ...parsed });
                     }
                 } catch (e) {
                     console.log("No saved state found");
@@ -1483,10 +2043,8 @@ ${result.outputFormat}
                 this.setState = (newState) => {
                     originalSetState(newState);
                     try {
-                        localStorage.setItem('mama_state', JSON.stringify({
-                            ...this.state,
-                            apiKey: "", // ไม่ save apiKey
-                            demoMode: true
+                        localStorage.setItem('mama_nonai_state', JSON.stringify({
+                            ...this.state
                         }));
                     } catch (e) {
                         console.log("Could not save state to localStorage");
@@ -1499,8 +2057,8 @@ ${result.outputFormat}
 
         // เริ่มต้นแอปพลิเคชัน
         document.addEventListener('DOMContentLoaded', function() {
-            window.app = new MAMAV2();
-            console.log("MAMA V.2 Demo Mode App loaded successfully!");
+            window.app = new MAMAV2NonAI();
+            console.log("MAMA V.2 Non-AI System loaded successfully!");
         });
     </script>
 </body>
