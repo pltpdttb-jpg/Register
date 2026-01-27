@@ -2,217 +2,1506 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ลงทะเบียนทายผล | Prudential NY Party</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAMA V.2 - AI Sale Assistant</title>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap');
-        body { font-family: 'Kanit', sans-serif; background: #0f0f13; color: white; min-height: 100vh; overflow-x: hidden; }
-        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
         
-        .lotto-paper {
-            background: #fff;
-            color: #000;
-            border-radius: 8px;
-            position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            background-image: radial-gradient(#eee 1.5px, transparent 1.5px);
-            background-size: 15px 15px;
+        * {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        .lotto-border { border: 2px solid #000; padding: 2px; }
         
-        .custom-input { 
-            background: rgba(255, 255, 255, 0.05); 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            color: white; 
-            transition: all 0.3s;
+        body {
+            overflow-x: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
-        .custom-input:focus {
-            border-color: #ED1B2E;
-            background: rgba(255, 255, 255, 0.1);
+        
+        #root {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+            --dark-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+        }
+        
+        .slide-in-from-bottom {
+            animation: slideInFromBottom 0.5s ease-out;
+        }
+        
+        @keyframes slideInFromBottom {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        input, textarea, select {
+            font-size: 16px !important;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        input:focus, textarea:focus, select:focus {
             outline: none;
-        }
-
-        .lotto-digit-input { 
-            background: #f8f8f8; 
-            border: 2px solid #333; 
-            font-size: 3.5rem; 
-            letter-spacing: 0.5rem; 
-            font-weight: 800;
-            text-align: center;
-            border-radius: 12px;
-            color: #000;
-        }
-        .lotto-digit-input:focus {
-            border-color: #ED1B2E;
-            background: #fff;
-            outline: none;
-        }
-
-        .btn-red { 
-            background: linear-gradient(135deg, #ED1B2E 0%, #B00000 100%); 
-            box-shadow: 0 4px 15px rgba(237, 27, 46, 0.4);
+            border-color: #0ea5e9 !important;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
         }
         
-        .label-text {
-            color: #9ca3af;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            display: block;
+        .fixed-height {
+            height: 100vh;
+            height: 100dvh;
+        }
+        
+        /* Icon colors - flat colors */
+        .icon-primary { color: #0ea5e9; }
+        .icon-secondary { color: #6366f1; }
+        .icon-success { color: #10b981; }
+        .icon-warning { color: #f59e0b; }
+        .icon-danger { color: #ef4444; }
+        .icon-purple { color: #8b5cf6; }
+        .icon-pink { color: #ec4899; }
+        .icon-gray { color: #6b7280; }
+        
+        /* Demo mode badge */
+        .demo-badge {
+            background: linear-gradient(45deg, #f59e0b, #fbbf24);
+            color: white;
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4">
-
-    <div class="w-full max-w-md relative">
-        <!-- Header -->
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold">Commercial New Year 2026</h1>
-            <p class="text-red-500 text-xs tracking-widest uppercase font-bold">Prudential Thailand</p>
-        </div>
-
-        <!-- Single Page Form -->
-        <div id="main-form" class="glass-card rounded-3xl p-6 shadow-2xl">
-            <h2 class="text-xl font-bold mb-6 text-center text-red-500 uppercase tracking-tight">
-                ร่วมทายผลฉลากกินไม่แบ่ง (ยอดขาย 2025)
-            </h2>
-            
-            <form id="prediction-form" class="space-y-5">
-                <!-- ข้อมูลส่วนตัว -->
-                <div class="space-y-4">
-                    <div>
-                        <label class="label-text">ชื่อ-นามสกุล</label>
-                        <input type="text" id="reg-name" required class="custom-input w-full rounded-xl px-4 py-3" placeholder="ระบุชื่อ-นามสกุล">
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="label-text">ชื่อเล่น</label>
-                            <input type="text" id="reg-nickname" required class="custom-input w-full rounded-xl px-4 py-3" placeholder="ชื่อเล่น">
-                        </div>
-                        <div>
-                            <label class="label-text">แผนก</label>
-                            <input type="text" id="reg-dept" required class="custom-input w-full rounded-xl px-4 py-3" placeholder="ระบุแผนก">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="label-text">รหัสพนักงาน</label>
-                        <input type="text" id="reg-emp-id" required class="custom-input w-full rounded-xl px-4 py-3" placeholder="Employee ID">
-                    </div>
-                </div>
-
-                <!-- พื้นที่ทายเลข (Lotto Style) -->
-                <div class="lotto-paper p-3 text-black mt-6">
-                    <div class="lotto-border flex flex-col items-center p-3 border-2 border-double border-blue-900">
-                        <div class="w-full flex justify-between items-start mb-2">
-                            <span class="text-[10px] font-bold border border-black px-1">2025</span>
-                            <div class="text-center">
-                                <p class="text-[10px] font-bold leading-none">ฉลากกินไม่แบ่ง ไม่ใช่ของรัฐบาล</p>
-                                <p class="text-[14px] font-black text-blue-900 leading-tight">งวดประจำปี 2025</p>
-                            </div>
-                            <span class="text-[10px] font-bold border border-black px-1 font-mono">№ 0001</span>
-                        </div>
-
-                        <div class="w-full my-4">
-                            <input type="number" id="lotto-num" required class="lotto-digit-input w-full" placeholder="00000" oninput="if(this.value.length > 5) this.value = this.value.slice(0, 5);">
-                            <p class="text-[10px] text-center mt-2 font-bold text-red-600">กรอกเลขนำโชค 5 หลักเพื่อชิงรางวัล</p>
-                        </div>
-
-                        <div class="w-full border-t border-black pt-2 flex justify-end">
-                            <div class="bg-red-600 text-white px-2 py-0.5 text-[10px] font-bold transform -rotate-1">
-                                PRUDENTIAL THAILAND
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" id="submit-btn" class="btn-red w-full py-4 rounded-2xl font-bold text-xl mt-4 shadow-xl active:scale-95 transition-all">
-                    ส่งข้อมูลและทายผล <i class="fa-solid fa-paper-plane ml-2"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- SUCCESS BOX -->
-        <div id="success-box" class="hidden glass-card rounded-3xl p-10 text-center border-2 border-green-500/30">
-            <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/20">
-                <i class="fa-solid fa-camera text-4xl text-white"></i>
-            </div>
-            <h2 class="text-2xl font-bold mb-2">ส่งฉลากสำเร็จ!</h2>
-            
-            <div class="bg-red-500/20 border border-red-500/50 rounded-2xl p-5 mb-6">
-                <p class="text-red-500 font-bold text-lg animate-pulse">
-                    ⚠️ สำคัญมาก: กรุณาแคปหน้าจอ<br>เพื่อยืนยันตอนรับรางวัล ⚠️
-                </p>
-                <div class="mt-3 text-white">
-                    <p class="text-xs text-gray-400 uppercase">เลขที่ท่านทายคือ</p>
-                    <p id="final-lotto-display" class="text-4xl font-black tracking-widest text-yellow-400">00000</p>
-                </div>
-            </div>
-            
-            <button onclick="location.reload()" class="text-gray-500 text-sm underline hover:text-white transition-colors">
-                กลับไปหน้าลงทะเบียน
-            </button>
-        </div>
-    </div>
-
+<body class="bg-slate-900">
+    <div id="root" class="fixed-height"></div>
+    
     <script>
-        // Supabase Configuration
-        const S_URL = ''; 
-        const S_KEY = ''; 
-        const client = supabase.createClient(S_URL, S_KEY);
-
-        const form = document.getElementById('prediction-form');
-        const submitBtn = document.getElementById('submit-btn');
-
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('reg-name').value;
-            const nickname = document.getElementById('reg-nickname').value;
-            const dept = document.getElementById('reg-dept').value;
-            const empId = document.getElementById('reg-emp-id').value;
-            const lottoNum = document.getElementById('lotto-num').value;
-
-            if(lottoNum.length !== 5) {
-                alert('กรุณากรอกเลขลอตเตอรี่ให้ครบ 5 หลัก');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> กำลังบันทึก...';
-
-            try {
-                // บันทึกข้อมูลพนักงาน
-                const { data, error } = await client.from('participants').insert([{ 
-                    name: `${name} (${nickname}) [${dept}]`, 
-                    employee_id: empId 
-                }]).select().single();
-                
-                if (error) throw error;
-
-                // บันทึกตัวเลขที่ทาย
-                await client.from('predictions').insert([{ 
-                    participant_id: data.id, 
-                    predicted_number: parseInt(lottoNum) 
-                }]);
-                
-                // แสดงหน้าจอสำเร็จ
-                document.getElementById('final-lotto-display').textContent = lottoNum;
-                document.getElementById('main-form').classList.add('hidden');
-                document.getElementById('success-box').classList.remove('hidden');
-                
-            } catch (err) {
-                alert('เกิดข้อผิดพลาด: ' + err.message);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'ส่งข้อมูลและทายผล <i class="fa-solid fa-paper-plane ml-2"></i>';
+        // ตั้งค่า Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': '#0ea5e9',
+                        'secondary': '#6366f1',
+                    }
+                }
             }
         };
+
+        // --- Enhanced Regional Data Schema ---
+        const RH_DATA = {
+            "RH1": {
+                name: "RH1: กรุงเทพฯ & ปริมณฑล",
+                dynamics: "สังคมเมือง เร่งรีบ แข่งขันสูง ค่าครองชีพสูงที่สุด",
+                keywords: ["ภาษีสังคม", "ค่าเสียเวลา", "ความคุ้มครองระดับพรีเมียม", "มรดกที่จับต้องได้"],
+                hospitals: ["บำรุงราษฎร์", "สมิติเวช สุขุมวิท", "กรุงเทพ", "พญาไท 2"],
+                tone: "Professional, กระชับ, เน้นตัวเลขและผลตอบแทน",
+                context: "เน้นการบริหารภาษี และการรักษาที่รวดเร็วใน รพ. ระดับ World Class",
+                commonGrounds: ["รถไฟฟ้า BTS/MRT", "ศูนย์การค้าชั้นนำ", "การจราจรติดขัด", "ค่าครองชีพสูง"],
+                metaphors: ["เหมือนขาดทุนจากหุ้นลงทุน", "เทียบกับค่าเช่าคอนโด 1 เดือน", "เทียบกับภาษีรถยนต์หรู"]
+            },
+            "RH2": {
+                name: "RH2: ภาคตะวันออก (EEC)",
+                dynamics: "เขตเศรษฐกิจใหม่ นิคมอุตสาหกรรม เมืองท่องเที่ยว รายได้สูงแต่มีความเสี่ยง",
+                keywords: ["ความเสี่ยงจากการทำงาน", "เงินก้อนหลังเกษียณไว", "สวัสดิการโรงงาน", "สวัสดิการเสริม"],
+                hospitals: ["กรุงเทพพัทยา", "สมิติเวช ศรีราชา", "พญาไท ศรีราชา"],
+                tone: "จริงใจ, เน้นความคุ้มค่า, ตรงไปตรงมา",
+                context: "เน้นการสร้างรายได้เสริมจากสวัสดิการเดิมที่ไม่ครอบคลุมหลังออกจากงาน",
+                commonGrounds: ["นิคมอุตสาหกรรม", "ท่าเรือแหลมฉบัง", "โรงงานขนาดใหญ่", "การท่องเที่ยวพัทยา"],
+                metaphors: ["เทียบกับค่ารักษาอุบัติเหตุโรงงาน", "เหมือนเบี้ยประกันรถบรรทุก", "เทียบกับค่าสวัสดิการขาดไป"]
+            },
+            "RH3": {
+                name: "RH3: ภาคเหนือ",
+                dynamics: "สังคมผู้สูงอายุ วัฒนธรรมล้านนา ท่องเที่ยวเชิงวัฒนธรรม",
+                keywords: ["บารมี", "ส่งต่อให้ลูกหลาน", "อยู่อย่างสง่างาม", "ความมั่นคงปลอดภัย"],
+                hospitals: ["เชียงใหม่ ราม", "กรุงเทพเชียงใหม่", "ศรีพัฒน์"],
+                tone: "นุ่มนวล, ให้เกียรติ, เน้นความสัมพันธ์ระยะยาว",
+                context: "เน้นเรื่องมรดกและการดูแลสุขภาพในวัยเกษียณที่เป็นภาระลูกหลานให้น้อยที่สุด",
+                commonGrounds: ["ประเพณีล้านนา", "การท่องเที่ยวเชิงวัฒนธรรม", "อากาศเย็นสบาย", "ชุมชนเข้มแข็ง"],
+                metaphors: ["เหมือนมรดกจากปู่ย่าตายาย", "เทียบกับค่ารักษาโรคร้ายในโรงพยาบาลเอกชน", "เหมือนเงินก้อนให้ลูกแต่งงาน"]
+            },
+            "RH4": {
+                name: "RH4: ภาคตะวันออกเฉียงเหนือ",
+                dynamics: "ครอบครัวขยาย เกษตรกรรมก้าวหน้า เสาหลักคนสำคัญ",
+                keywords: ["ความกตัญญู", "พึ่งพาตัวเองได้", "ทุนการศึกษาลูก", "ไม่เป็นภาระใคร"],
+                hospitals: ["กรุงเทพขอนแก่น", "เอกอุดร", "พริ้นซ์ อุบลราชธานี"],
+                tone: "เป็นกันเอง, จริงใจเหมือนญาติ, เข้าถึงง่าย",
+                context: "เน้นการปกป้องเสาหลักของบ้านที่มีความรับผิดชอบต่อคนจำนวนมาก",
+                commonGrounds: ["เกษตรกรรม", "ตลาดนัดชุมชน", "ครอบครัวใหญ่", "ความเป็นอยู่เรียบง่าย"],
+                metaphors: ["เหมือนเงินกองทุนหมู่บ้าน", "เทียบกับค่ารักษา 1 ครั้งในกรุงเทพ", "เหมือนเงินส่งลูกเรียนมหาวิทยาลัย"]
+            },
+            "RH5": {
+                name: "RH5: ภาคใต้",
+                dynamics: "การประมง/สวนยาง/ท่องเที่ยว รายได้สูงเป็นช่วงเวลา",
+                keywords: ["ใจนักเลง", "พวกพ้อง", "สภาพคล่อง", "การันตีรายได้"],
+                hospitals: ["กรุงเทพหาดใหญ่", "กรุงเทพภูเก็ต", "สงขลานครินทร์ (SMC)"],
+                tone: "หนักแน่น, ชัดเจน, จริงใจ, ไม่เยิ่นเย้อ",
+                context: "เน้นการล็อกกำไรจากธุรกิจและการสร้างกระแสเงินสดที่สม่ำเสมอ",
+                commonGrounds: ["สวนยางพารา", "การประมง", "ธุรกิจท่องเที่ยว", "เส้นทางชายฝั่ง"],
+                metaphors: ["เหมือนประกันเรือประมง", "เทียบกับค่าน้ำยาง 1 วัน", "เหมือนเงินสำรองเมื่อพายุเข้ามา"]
+            }
+        };
+
+        const ZONES = {
+            "RH1": ["สาทร-สีลม", "สุขุมวิท", "ลาดพร้าว", "นนทบุรี", "สมุทรปราการ"],
+            "RH2": ["ชลบุรี", "ศรีราชา-พัทยา", "ระยอง", "ฉะเชิงเทรา"],
+            "RH3": ["เชียงใหม่", "เชียงราย", "พิษณุโลก", "นครสวรรค์"],
+            "RH4": ["ขอนแก่น", "นครราชสีมา", "อุบลราชธานี", "อุดรธานี"],
+            "RH5": ["หาดใหญ่", "ภูเก็ต", "สุราษฎร์ธานี", "นครศรีธรรมราช"]
+        };
+
+        // Insurance Products Database
+        const INSURANCE_PRODUCTS = {
+            "ลดหย่อนภาษี": [
+                { name: "ประกันชีวิตแบบออมทรัพย์", coverage: "ชีวิต 1,000,000 บาท + สะสมทรัพย์", premium: "25,000-50,000", features: ["ลดหย่อนภาษีได้ 100%", "เงินคืนเมื่อครบสัญญา", "คุ้มครองชีวิต"] },
+                { name: "ประกันชีวิตแบบบำนาญ", coverage: "ชีวิต + บำนาญวัยเกษียณ", premium: "30,000-60,000", features: ["ลดหย่อนภาษีได้ 100%", "รับเงินบำนาญเมื่อเกษียณ", "คุ้มครองชีวิตตลอดสัญญา"] }
+            ],
+            "มรดกให้ลูกหลาน": [
+                { name: "ประกันชีวิตแบบตลอดชีพ", coverage: "ชีวิต 2,000,000 บาท", premium: "40,000-80,000", features: ["คุ้มครองตลอดชีวิต", "มรดกให้ทายาท", "เบี้ยประกันคงที่"] },
+                { name: "ประกันชีวิตแบบสะสมทรัพย์", coverage: "ชีวิต 1,500,000 บาท + สะสมทรัพย์", premium: "30,000-50,000", features: ["มรดกพร้อมเงินออม", "เบี้ยประกันคงที่", "เงินคืนบางส่วนหากยังมีชีวิตอยู่"] }
+            ],
+            "ค่ารักษาพยาบาล (สุขภาพ)": [
+                { name: "ประกันสุขภาพ IPD/OPD", coverage: "ค่ารักษาพยาบาลสูงสุด 500,000 บาท", premium: "15,000-30,000", features: ["คุ้มครองผู้ป่วยใน-ผู้ป่วยนอก", "เหมาจ่ายตามจริง", "ไม่มีวงเงินต่อครั้ง"] },
+                { name: "ประกันโรคร้ายแรง", coverage: "โรคร้ายแรง 1,000,000 บาท", premium: "20,000-40,000", features: ["คุ้มครองโรคร้ายแรง 30 โรค", "จ่ายก้อนเมื่อตรวจพบโรค", "เบี้ยประกันคงที่"] }
+            ],
+            "เงินออม/เกษียณ": [
+                { name: "ประกันชีวิตแบบสะสมทรัพย์ระยะยาว", coverage: "ชีวิต + สะสมทรัพย์", premium: "50,000-100,000", features: ["ออมเงินระยะยาว", "รับเงินก้อนเมื่อครบสัญญา", "ลดหย่อนภาษีได้"] },
+                { name: "ประกันบำนาญก่อนเกษียณ", coverage: "ชีวิต + บำนาญ", premium: "60,000-120,000", features: ["รับบำนาญเมื่ออายุ 55/60 ปี", "คุ้มครองชีวิตระหว่างออม", "ลดหย่อนภาษีได้"] }
+            ]
+        };
+
+        // Objection Handling Rules
+        const OBJECTION_RULES = {
+            "เงินไม่พอ": {
+                technique: "LSCPA (Listen-Share-Clarify-Proceed-Ask)",
+                responses: [
+                    "ผม/ดิฉันเข้าใจดีว่าค่าใช้จ่ายทุกวันนี้สูงมาก",
+                    "ลูกค้าหลายท่านกังวลเหมือนกัน แต่พบว่าการจ่ายเบี้ยประกันน้อยกว่าค่าใช้จ่ายที่ไม่คาดคิดในอนาคต",
+                    "เรามาดูแผนที่เริ่มจากงบประมาณน้อยๆ ก่อนได้ไหม?"
+                ],
+                comparison: "เปรียบเทียบเบี้ยประกันกับค่าใช้จ่ายที่ไม่จำเป็น เช่น ค่าสูบบุหรี่/ซื้อลอตเตอรี่"
+            },
+            "มีประกันเยอะแล้ว": {
+                technique: "Gap Analysis",
+                responses: [
+                    "ดีมากครับ/ค่ะ ที่คุณมีพื้นฐานการวางแผนแล้ว",
+                    "เรามาตรวจสอบร่วมกันว่าแผนปัจจุบันครอบคลุมความเสี่ยงหลักหรือยัง",
+                    "การประกันชีวิตไม่ใช่เรื่องของปริมาณ แต่เป็นเรื่องความพอเหมาะกับไลฟ์สไตล์ปัจจุบัน"
+                ],
+                comparison: "เปรียบเทียบกับสวัสดิการที่มีอยู่แล้ว ชี้จุดที่ยังขาด"
+            },
+            "ขอถามแฟน/ครอบครัวก่อน": {
+                technique: "Value Proposition",
+                responses: [
+                    "เป็นการตัดสินใจที่ดีที่ปรึกษาครอบครัว",
+                    "ผม/ดิฉันมีเอกสารสรุปให้คุณนำไปปรึกษาครอบครัวได้",
+                    "ความรักและความห่วงใยคือสิ่งที่เราอยากปกป้องที่สุด"
+                ],
+                comparison: "เน้นการคุ้มครองคนที่รักแทนที่จะรอให้สายเกินไป"
+            },
+            "ประกันโกง/เบิกยาก": {
+                technique: "Testimonial & Trust Building",
+                responses: [
+                    "ผม/ดิฉันเข้าใจความกังวลนี้ดี มีข่าวแบบนี้บ่อย",
+                    "บริษัทของเรามีการจ่ายเคลม 98% ภายใน 7 วันทำการ",
+                    "ผม/ดิฉันสามารถให้ข้อมูลลูกค้าที่เคยใช้บริการจริงได้"
+                ],
+                comparison: "เปรียบเทียบกับบริษัทที่จ่ายเคลมช้าหรือมีปัญหา"
+            },
+            "ยังไม่รีบ/ยังแข็งแรง": {
+                technique: "Risk Awareness",
+                responses: [
+                    "ดีมากครับ/ค่ะ ที่คุณยังสุขภาพแข็งแรง",
+                    "ประกันสุขภาพจะรับซื้อได้ง่ายและราคาถูกเมื่อยังสุขภาพดี",
+                    "อุบัติเหตุหรือเจ็บป่วยไม่ได้บอกล่วงหน้า"
+                ],
+                comparison: "เปรียบเทียบกับการซื้อประกันรถก่อนขับรถ"
+            }
+        };
+
+        // Icon mapping - Flat color icons
+        const ICONS = {
+            calculator: '<i class="fas fa-calculator icon-primary"></i>',
+            message: '<i class="fas fa-comment-dots icon-secondary"></i>',
+            shield: '<i class="fas fa-shield-alt icon-warning"></i>',
+            gift: '<i class="fas fa-gift icon-success"></i>',
+            bag: '<i class="fas fa-shopping-bag icon-purple"></i>',
+            file: '<i class="fas fa-file-check icon-success"></i>',
+            terminal: '<i class="fas fa-terminal icon-gray"></i>',
+            sparkles: '<i class="fas fa-sparkles icon-warning"></i>',
+            map: '<i class="fas fa-map-marker-alt icon-danger"></i>',
+            alert: '<i class="fas fa-exclamation-circle icon-danger"></i>',
+            building: '<i class="fas fa-building icon-primary"></i>',
+            stethoscope: '<i class="fas fa-stethoscope icon-purple"></i>',
+            lightbulb: '<i class="fas fa-lightbulb icon-warning"></i>',
+            zap: '<i class="fas fa-bolt icon-warning"></i>',
+            trending: '<i class="fas fa-chart-line icon-success"></i>',
+            copy: '<i class="fas fa-copy icon-gray"></i>',
+            rotate: '<i class="fas fa-redo icon-gray"></i>',
+            thumbsUp: '<i class="fas fa-thumbs-up icon-success"></i>',
+            thumbsDown: '<i class="fas fa-thumbs-down icon-danger"></i>',
+            share: '<i class="fas fa-share-alt icon-primary"></i>',
+            save: '<i class="fas fa-save icon-primary"></i>',
+            chevronRight: '<i class="fas fa-chevron-right"></i>',
+            demoBadge: '<i class="fas fa-flask icon-warning"></i>'
+        };
+
+        // --- Demo Mode Analysis Engine ---
+        class DemoAnalysisEngine {
+            static analyzeNeeds(formData, rhData, zone) {
+                const income = parseFloat(formData.income) || 0;
+                const expense = parseFloat(formData.expense) || 0;
+                const debt = parseFloat(formData.debt) || 0;
+                const dependents = parseInt(formData.dependents) || 0;
+                const years = parseInt(formData.years) || 1;
+                const assets = parseFloat(formData.assets) || 0;
+                
+                const totalNeed = debt + (expense * 12 * years);
+                const gap = Math.max(0, totalNeed - assets);
+                const months = expense > 0 ? (assets / expense) : 0;
+                
+                // Risk assessment
+                let riskLevel = "ต่ำ";
+                let recommendations = [];
+                
+                if (gap > income * 5) riskLevel = "สูงมาก";
+                else if (gap > income * 3) riskLevel = "สูง";
+                else if (gap > income * 1) riskLevel = "ปานกลาง";
+                
+                // Generate recommendations
+                if (gap > 0) {
+                    recommendations.push(`ควรมีประกันชีวิตอย่างน้อย ${Math.round(gap / 1000000)} ล้านบาท`);
+                }
+                
+                if (expense > income * 0.4) {
+                    recommendations.push("พิจารณาปรับลดค่าใช้จ่ายที่ไม่จำเป็น");
+                }
+                
+                if (dependents > 0) {
+                    recommendations.push(`ควรมีประกันการศึกษาสำหรับลูก ${dependents >= 2 ? "แต่ละคน" : ""}`);
+                }
+                
+                if (years < 10) {
+                    recommendations.push("ควรวางแผนระยะยาวเพิ่มเติมสำหรับวัยเกษียณ");
+                }
+                
+                const metaphor = rhData.metaphors ? rhData.metaphors[Math.floor(Math.random() * rhData.metaphors.length)] : "เทียบกับค่าครองชีพในพื้นที่";
+                
+                return {
+                    gap,
+                    months: months.toFixed(1),
+                    riskLevel,
+                    recommendations,
+                    metaphor
+                };
+            }
+            
+            static analyzeIceBreaking(formData, rhData, zone) {
+                const age = formData.age || "35-40";
+                const job = formData.job || "อาชีพทั่วไป";
+                const location = formData.location || "สถานที่พบกัน";
+                const observation = formData.observation || "";
+                
+                const commonGround = rhData.commonGrounds ? rhData.commonGrounds[Math.floor(Math.random() * rhData.commonGrounds.length)] : "วัฒนธรรมท้องถิ่น";
+                
+                // Generate conversation starters
+                const starters = [
+                    `"สวัสดีครับ/ค่ะ ดิฉัน/ผมเป็นที่ปรึกษาการเงินจาก MAMA AI วันนี้มีโอกาสดีมาแนะนำแผนการเงินที่เหมาะกับคน${age}อย่างคุณ"`,
+                    `"ในฐานะ${job} คุณคงเข้าใจดีว่าความมั่นคงทางการเงินสำคัญแค่ไหน ใช่ไหมครับ/คะ?"`,
+                    `"เห็นคุณมา${location} นึกถึงเรื่องหนึ่งที่เกี่ยวข้องกับ${commonGround}พอดี..."`
+                ];
+                
+                const jobConnection = [
+                    `"สำหรับ${job}แบบคุณ มักมีความเสี่ยงเรื่อง... เรามีแผนที่จัดการได้"`,
+                    `"ลูกค้าที่เป็น${job}หลายท่านเลือกแผนนี้เพราะตอบโจทย์ไลฟ์สไตล์ทำงาน"`,
+                    `"อาชีพ${job}มีข้อดีหลายอย่าง แต่ในแง่การเงินอาจมีจุดที่ต้องเสริม..."`
+                ];
+                
+                const hook = [
+                    `"ถ้ามีวันหนึ่งคุณไม่สามารถทำงานได้อีก ${dependents > 0 ? 'ลูก' : 'ครอบครัว'}คุณจะมีเงินใช้กี่เดือน?"`,
+                    `"เคยคำนวณไหมว่า ถ้าวันนี้คุณหายไป รายได้ที่ขาดหายจะเท่าไร?"`,
+                    `"สุขภาพที่ดีวันนี้ ไม่รับประกันว่าจะดีไปตลอด เราวางแผนกันยังไงดี?"`
+                ];
+                
+                return {
+                    starters,
+                    jobConnection,
+                    hook,
+                    tone: rhData.tone || "เป็นมืออาชีพ",
+                    commonGround
+                };
+            }
+            
+            static handleObjection(formData, rhData, zone) {
+                const type = formData.type || "เงินไม่พอ";
+                const quote = formData.direct_quote || "";
+                
+                const rule = OBJECTION_RULES[type] || OBJECTION_RULES["เงินไม่พอ"];
+                
+                // Generate LSCPA response
+                const lscpa = {
+                    Listen: `"${quote ? 'คุณบอกว่า: \"' + quote + '\"' : 'ผม/ดิฉันเข้าใจความกังวลของคุณ'}"`,
+                    Share: `"ลูกค้าหลายท่านใน${zone}ก็มีความคิดแบบนี้ แต่หลังจากคุยกันพบว่า..."`,
+                    Clarify: rule.responses[1] || "การวางแผนการเงินเป็นการลงทุนในความมั่นคง ไม่ใช่ค่าใช้จ่าย",
+                    Proceed: "เรามาดูแผนที่เริ่มจากน้อยๆ ก่อนได้ไหม? ผม/ดิฉันมีตัวอย่างให้ดู",
+                    Ask: "คุณคิดว่ายังไงกับแนวทางนี้ครับ/คะ?"
+                };
+                
+                const reframing = `"แทนที่จะมองว่าเป็นค่าใช้จ่าย ลองมองว่าเป็น${rule.comparison}สิครับ/คะ"`;
+                
+                const regionalExample = rhData.keywords ? ` เช่น คน${zone}มักจะกังวลเรื่อง "${rhData.keywords[Math.floor(Math.random() * rhData.keywords.length)]}"` : "";
+                
+                return {
+                    technique: rule.technique,
+                    lscpa,
+                    reframing,
+                    regionalExample,
+                    closing: `"ไม่ว่า${type} เรามีทางเลือกให้คุณเสมอ"`
+                };
+            }
+            
+            static simplifyPlan(formData, rhData, zone) {
+                const planName = formData.plan_name || "แผนประกัน";
+                const premium = parseFloat(formData.premium) || 10000;
+                const benefits = formData.benefits || "";
+                
+                const dailyCost = (premium / 365).toFixed(2);
+                
+                // Local cost comparison
+                let localComparison = "ค่ากาแฟ 1 แก้ว";
+                if (zone.includes("กรุงเทพ") || zone.includes("สาทร") || zone.includes("สุขุมวิท")) {
+                    localComparison = "ค่ากาแฟร้าน Starbucks";
+                } else if (zone.includes("พัทยา") || zone.includes("ภูเก็ต")) {
+                    localComparison = "ค่าเครื่องดื่ม 1 แก้วในร้านริมทะเล";
+                } else if (zone.includes("เชียงใหม่")) {
+                    localComparison = "ค่าข้าวซอย 1 ชาม";
+                } else if (zone.includes("ขอนแก่น") || zone.includes("อุดร")) {
+                    localComparison = "ค่าส้มตำปูปลาร้า 2 จาน";
+                } else if (zone.includes("หาดใหญ่")) {
+                    localComparison = "ค่าขนมจีน 1 ที่";
+                }
+                
+                // Extract benefits
+                const benefitList = benefits.split('\n').filter(b => b.trim()).slice(0, 3);
+                const simplifiedBenefits = benefitList.length > 0 ? benefitList : [
+                    "คุ้มครองชีวิตและสุขภาพครบวงจร",
+                    "เบี้ยคงที่ตลอดสัญญา",
+                    "เงินคืนเมื่อครบอายุสัญญา"
+                ];
+                
+                // Generate 3 golden sentences
+                const goldenSentences = [
+                    `"คุ้มครองชีวิตและสุขภาพรายวันในราคาเพียง ${dailyCost} บาท/วัน (เท่ากับ${localComparison})"`,
+                    `"${simplifiedBenefits[0].replace(/[0-9\.]+/g, '').substring(0, 50)}"`,
+                    `"วางแผนการเงินมั่นใจได้ เพราะ${planName}ดูแลคุณทั้งวันนี้และวันหน้า"`
+                ];
+                
+                return {
+                    dailyCost,
+                    localComparison,
+                    goldenSentences,
+                    benefitSummary: simplifiedBenefits
+                };
+            }
+            
+            static matchProduct(formData, rhData, zone) {
+                const goal = formData.goal || "ลดหย่อนภาษี";
+                const budget = parseFloat(formData.budget) || 30000;
+                
+                const products = INSURANCE_PRODUCTS[goal] || INSURANCE_PRODUCTS["ลดหย่อนภาษี"];
+                
+                // Find best match based on budget
+                let bestMatch = products[0];
+                let bestScore = Infinity;
+                
+                products.forEach(product => {
+                    const priceRange = product.premium.split('-').map(p => parseInt(p.replace(/[^0-9]/g, '')));
+                    const avgPrice = (priceRange[0] + (priceRange[1] || priceRange[0])) / 2;
+                    const score = Math.abs(avgPrice - budget);
+                    
+                    if (score < bestScore) {
+                        bestScore = score;
+                        bestMatch = product;
+                    }
+                });
+                
+                // Localize recommendation
+                let localReason = "";
+                if (goal === "ค่ารักษาพยาบาล (สุขภาพ)") {
+                    localReason = `คน${zone} มักใช้บริการ ${rhData.hospitals ? rhData.hospitals[0] : "โรงพยาบาลชั้นนำ"} ดังนั้นแผนสุขภาพจึงสำคัญ`;
+                } else if (goal === "มรดกให้ลูกหลาน") {
+                    localReason = `ตามวัฒนธรรม${zone} การเตรียมมรดกให้ลูกหลานเป็นเรื่องสำคัญ`;
+                } else {
+                    localReason = `แผนนี้ตอบโจทย์คน${zone} ที่มักจะมีลักษณะ${rhData.keywords ? rhData.keywords[0] : "เฉพาะตัว"}`;
+                }
+                
+                // Gap analysis
+                const existingWelfare = ["ประกันสังคม", "สวัสดิการบริษัท", "เงินออมส่วนตัว"];
+                const missingCoverage = ["ค่ารักษาพยาบาลส่วนเกิน", "รายได้ทดแทน", "มรดกที่จับต้องได้"];
+                
+                return {
+                    recommendedProduct: bestMatch,
+                    budgetFit: budget >= parseInt(bestMatch.premium.split('-')[0].replace(/[^0-9]/g, '')) ? "พอดี" : "อาจต้องปรับแผน",
+                    localReason,
+                    existingWelfare,
+                    missingCoverage,
+                    actionPlan: `เริ่มต้นด้วยเบี้ย ${Math.max(10000, budget * 0.8).toLocaleString()} บาท/ปี แล้วปรับเพิ่มตามรายได้`
+                };
+            }
+            
+            static generateClosing(formData, rhData, zone) {
+                const interest = formData.interest_point || "ความคุ้มครองสุขภาพ";
+                const concern = formData.last_concern || "ค่าเบี้ยประกัน";
+                
+                // Urgency factor based on region
+                let urgency = "";
+                if (zone.includes("กรุงเทพ") || zone.includes("ปริมณฑล")) {
+                    urgency = "สิทธิพิเศษโรงพยาบาลเอกชนชั้นนำ";
+                } else if (zone.includes("พัทยา") || zone.includes("ภูเก็ต")) {
+                    urgency = "โควต้าสำหรับลูกค้าพื้นที่ท่องเที่ยว";
+                } else if (zone.includes("เชียงใหม่")) {
+                    urgency = "โปรโมชั่นพิเศษสำหรับคนเหนือ";
+                } else {
+                    urgency = "สิทธิพิเศษโรงพยาบาลในเครือข่าย";
+                }
+                
+                // Alternative close techniques
+                const closes = [
+                    `"คุณสะดวกเริ่มแผนวันไหนดีครับ/คะ หรือจะรอให้ถึง${new Date(new Date().setDate(new Date().getDate() + 7)).toLocaleDateString('th-TH')}?"`,
+                    `"คุณอยากเน้น${interest}เป็นหลัก หรือมีประเด็นอื่นที่กังวลนอกจาก${concern}?"`,
+                    `"เพื่อไม่ให้พลาด${urgency} เราเริ่มต้นเอกสารเบื้องต้นเลยดีไหม?"`
+                ];
+                
+                const summary = `"สรุปคือ คุณชอบใน${interest} แต่กังวลเรื่อง${concern} ทางเราแก้โดย... และมี${urgency}ให้ด้วย"`;
+                
+                return {
+                    urgency,
+                    closes,
+                    summary,
+                    nextStep: "กรอกใบสมัครเบื้องต้นเพื่อจองสิทธิ์",
+                    confidenceBuilder: `"ลูกค้าใน${zone}กว่า 85% ที่เลือกแผนนี้พอใจในระยะยาว"`
+                };
+            }
+            
+            static designPrompt(formData, rhData, zone) {
+                const objective = formData.objective || "สร้างบทสนทนา";
+                const target = formData.target || "ลูกค้า";
+                const tone = formData.tone || "Professional";
+                const details = formData.details || "";
+                
+                // Analyze intent
+                let intentAnalysis = "";
+                if (objective.includes("โพสต์") || objective.includes("Facebook") || objective.includes("โซเชียล")) {
+                    intentAnalysis = "สร้างคอนเทนต์สำหรับโซเชียลมีเดีย เน้นดึงดูดความสนใจและสร้างการมีส่วนร่วม";
+                } else if (objective.includes("บทสนทนา") || objective.includes("พูดคุย")) {
+                    intentAnalysis = "ออกแบบบทสนทนาสำหรับการพบปะลูกค้าโดยตรง เน้นธรรมชาติและสัมพันธภาพ";
+                } else if (objective.includes("เสนอขาย") || objective.includes("พรีเซนต์")) {
+                    intentAnalysis = "สร้างสคริปต์สำหรับการนำเสนอขาย เน้นความน่าเชื่อถือและข้อมูลชัดเจน";
+                } else {
+                    intentAnalysis = "ออกแบบสื่อสารทางการตลาดที่ตอบโจทย์วัตถุประสงค์ที่ระบุ";
+                }
+                
+                // Master prompt
+                const masterPrompt = `Role: คุณคือที่ปรึกษาประกันมืออาชีพที่เข้าใจลึกซึ้งเกี่ยวกับพื้นที่${zone}
+Context: ${rhData.name} - ${rhData.dynamics}
+Target Audience: ${target}
+Tone: ${tone} ${tone === "Professional" ? "แต่ยังคงความเป็นกันเอง" : ""}
+Objective: ${objective}
+Specific Details to Include: ${details || "ชื่อโรงพยาบาล: " + (rhData.hospitals ? rhData.hospitals.join(", ") : "โรงพยาบาลชั้นนำ")}
+Local Keywords to Use: ${rhData.keywords ? rhData.keywords.slice(0, 3).join(", ") : ""}
+
+Task: สร้างเนื้อหาที่มีโครงสร้างชัดเจน ใช้ตัวอย่างจากชีวิตจริงในพื้นที่ และปิดท้ายด้วย Call-to-Action ที่เหมาะกับ${target}`;
+                
+                // Tuning tips
+                const tuningTips = [
+                    "เพิ่มตัวอย่างกรณีศึกษาเฉพาะพื้นที่เพื่อสร้างความเชื่อมั่น",
+                    "ใช้ภาษาที่เหมาะกับ${tone} แต่ยังคงความเป็นท้องถิ่น",
+                    "เน้นประโยชน์ที่จับต้องได้มากกว่าคำศัพท์ทางเทคนิค",
+                    "ปรับความยาวตามช่องทางสื่อสาร (โซเชียล: สั้นกระชับ, การขาย: ละเอียดครบถ้วน)"
+                ];
+                
+                return {
+                    intentAnalysis,
+                    masterPrompt,
+                    tuningTips,
+                    outputFormat: "1. เกริ่นนำ 2. ปัญหา/ความต้องการ 3. วิธีแก้ไข 4. ประโยชน์ 5. ขั้นตอนต่อไป"
+                };
+            }
+        }
+
+        // --- React-like Components without React ---
+        class MAMAV2 {
+            constructor() {
+                this.state = {
+                    apiKey: "",
+                    isSetup: false,
+                    userProfile: { agentName: "", rh: "", zone: "" },
+                    activeTab: "needs_analysis",
+                    loading: false,
+                    aiResponse: "",
+                    error: "",
+                    feedback: null,
+                    demoMode: true, // เริ่มต้นด้วย Demo Mode
+                    forms: {
+                        needs_analysis: { income: "", expense: "", debt: "", dependents: "", years: "", assets: "" },
+                        ice_breaking: { age: "", job: "", location: "", observation: "" },
+                        objection: { type: "เงินไม่พอ", direct_quote: "" },
+                        simplifier: { plan_name: "", benefits: "", premium: "" },
+                        matchmaker: { goal: "ลดหย่อนภาษี", budget: "" },
+                        closing: { interest_point: "", last_concern: "" },
+                        prompt_designer: { objective: "", target: "", tone: "Professional", details: "" }
+                    }
+                };
+                
+                this.inputElements = {};
+                this.init();
+            }
+            
+            setState(newState) {
+                for (let key in newState) {
+                    if (typeof this.state[key] === 'object' && this.state[key] !== null && !Array.isArray(this.state[key])) {
+                        this.state[key] = { ...this.state[key], ...newState[key] };
+                    } else {
+                        this.state[key] = newState[key];
+                    }
+                }
+                this.render();
+            }
+            
+            handleInputChange(tab, field, value) {
+                this.state.forms[tab][field] = value;
+                const inputId = `${tab}-${field}`;
+                if (this.inputElements[inputId]) {
+                    this.inputElements[inputId].value = value;
+                }
+                if (tab === 'needs_analysis') {
+                    this.updateGapDisplay();
+                }
+            }
+            
+            calculateRealityCheck() {
+                const f = this.state.forms.needs_analysis;
+                const income = parseFloat(f.income) || 0;
+                const expense = parseFloat(f.expense) || 0;
+                const debt = parseFloat(f.debt) || 0;
+                const years = parseFloat(f.years) || 1;
+                const assets = parseFloat(f.assets) || 0;
+                
+                const totalNeed = debt + (expense * 12 * years);
+                const gap = Math.max(0, totalNeed - assets);
+                const months = expense > 0 ? (assets / expense) : 0;
+                return { gap, months };
+            }
+            
+            updateGapDisplay() {
+                const { gap } = this.calculateRealityCheck();
+                const gapElement = document.getElementById('protection-gap');
+                if (gapElement) {
+                    gapElement.textContent = `${gap.toLocaleString()} บาท`;
+                }
+            }
+            
+            // Demo Mode Analysis
+            generateDemoResponse() {
+                const tab = this.state.activeTab;
+                const formData = this.state.forms[tab];
+                const rhData = RH_DATA[this.state.userProfile.rh] || {};
+                const zone = this.state.userProfile.zone;
+                
+                let result;
+                
+                switch(tab) {
+                    case "needs_analysis":
+                        result = DemoAnalysisEngine.analyzeNeeds(formData, rhData, zone);
+                        return `### 🎯 ผลการวิเคราะห์ Protection Gap (DEMO MODE)
+                        
+**ข้อมูลการวิเคราะห์:**
+- Protection Gap: ${result.gap.toLocaleString()} บาท
+- ระยะเวลาอยู่รอด: ${result.months} เดือน
+- ระดับความเสี่ยง: ${result.riskLevel}
+
+**การเปรียบเทียบในพื้นที่${zone}:**
+ทุนประกันที่ขาด ${result.gap.toLocaleString()} บาท ${result.metaphors ? '(' + result.metaphors + ')' : ''}
+
+**คำแนะนำเฉพาะบุคคล:**
+${result.recommendations.map((rec, i) => `${i+1}. ${rec}`).join('\n')}
+
+**ข้อควรพิจารณาเพิ่มเติม:**
+1. ควรมีเงินสำรองฉุกเฉิน 3-6 เท่าของรายจ่ายเดือน
+2. พิจารณาประกันสุขภาพครอบคลุมโรคร้ายแรง
+3. วางแผนการออมระยะยาวควบคู่กับประกันชีวิต`;
+
+                    case "ice_breaking":
+                        result = DemoAnalysisEngine.analyzeIceBreaking(formData, rhData, zone);
+                        return `### 🗣️ บทสนทนาเปิดใจ 3 รูปแบบ (DEMO MODE)
+                        
+**บริบทพื้นที่:** ${zone} - ${rhData.tone}
+**สถานที่พบกัน:** ${formData.location || "ร้านกาแฟ"}
+**อายุ/อาชีพ:** ${formData.age || "35-40"} / ${formData.job || "อาชีพทั่วไป"}
+
+**1. รูปแบบทั่วไป (ทั่วไป):**
+${result.starters[0]}
+
+**2. เชื่อมโยงอาชีพ:**
+${result.jobConnection[0]}
+
+**3. Hook เปิดใจ:**
+${result.hook[0]}
+
+**เคล็ดลับสำหรับพื้นที่${zone}:**
+- ใช้ 'Local Common Ground': ${result.commonGround}
+- น้ำเสียง: ${result.tone}
+- เริ่มจากประเด็นใกล้ตัวก่อนเข้าสู่ธุรกิจ`;
+
+                    case "objection":
+                        result = DemoAnalysisEngine.handleObjection(formData, rhData, zone);
+                        return `### 🛡️ เทคนิค LSCPA แก้ข้อโต้แย้ง (DEMO MODE)
+                        
+**ข้อโต้แย้ง:** ${formData.type}
+**คำพูดลูกค้า:** "${formData.direct_quote || 'ไม่ระบุ'}"
+
+**เทคนิค:** ${result.technique}
+
+**LSCPA ในพื้นที่${zone}:**
+- **L (Listen):** ${result.lscpa.Listen}
+- **S (Share):** ${result.lscpa.Share}
+- **C (Clarify):** ${result.lscpa.Clarify}
+- **P (Proceed):** ${result.lscpa.Proceed}
+- **A (Ask):** ${result.lscpa.Ask}
+
+**Reframing เทคนิค:**
+${result.reframing}
+
+**ตัวอย่างในพื้นที่:** ${result.regionalExample}
+
+**ปิดการสนทนา:**
+${result.closing}`;
+
+                    case "simplifier":
+                        result = DemoAnalysisEngine.simplifyPlan(formData, rhData, zone);
+                        return `### 💎 3 ประโยคทองคำย่อยแผนประกัน (DEMO MODE)
+                        
+**แผนประกัน:** ${formData.plan_name || "แผนประกันทั่วไป"}
+**เบี้ยประกัน:** ${parseFloat(formData.premium || 0).toLocaleString()} บาท/ปี
+
+**เปรียบเทียบเบี้ยรายวัน:**
+เบี้ยประกัน ${result.dailyCost} บาท/วัน ≈ ${result.localComparison} ใน${zone}
+
+**3 ประโยคทองคำ:**
+1. ${result.goldenSentences[0]}
+2. ${result.goldenSentences[1]}
+3. ${result.goldenSentences[2]}
+
+**สรุปผลประโยชน์หลัก:**
+${result.benefitSummary.map((b, i) => `${i+1}. ${b}`).join('\n')}
+
+**คำแนะนำการนำเสนอ:**
+- ใช้การเปรียบเทียบกับค่าครองชีพใน${zone}
+- เน้นความคุ้มค่าต่อวันมากกว่าต่อปี
+- ยกตัวอย่างกรณีศึกษาจริงในพื้นที่`;
+
+                    case "matchmaker":
+                        result = DemoAnalysisEngine.matchProduct(formData, rhData, zone);
+                        return `### 🎯 แผนประกันที่เหมาะกับคุณ (DEMO MODE)
+                        
+**เป้าหมาย:** ${formData.goal}
+**งบประมาณ:** ${parseFloat(formData.budget || 0).toLocaleString()} บาท/ปี
+
+**แผนแนะนำ:** ${result.recommendedProduct.name}
+**ความคุ้มครอง:** ${result.recommendedProduct.coverage}
+**เบี้ยประกัน:** ${result.recommendedProduct.premium} บาท/ปี
+**ความเหมาะสมกับงบ:** ${result.budgetFit}
+
+**เหตุผลสำหรับพื้นที่${zone}:**
+${result.localReason}
+
+**วิเคราะห์สวัสดิการที่มีอยู่:**
+✅ ${result.existingWelfare.join('\n✅ ')}
+
+**ส่วนที่ควรเติมเต็ม:**
+➕ ${result.missingCoverage.join('\n➕ ')}
+
+**แผนดำเนินการ:**
+${result.actionPlan}
+
+**ขั้นตอนต่อไป:**
+1. ตรวจสอบคุณสมบัติเบื้องต้น
+2. เปรียบเทียบกับแผนอื่นในงบใกล้เคียง
+3. เริ่มต้นด้วยจำนวนความคุ้มครองที่เหมาะสม`;
+
+                    case "closing":
+                        result = DemoAnalysisEngine.generateClosing(formData, rhData, zone);
+                        return `### ✅ สรุปและปิดการขาย (DEMO MODE)
+                        
+**จุดสนใจของลูกค้า:** ${formData.interest_point}
+**ข้อกังวลสุดท้าย:** ${formData.last_concern}
+
+**สรุปจุดเด่น:**
+"คุณชอบใน${formData.interest_point} ซึ่งแผนนี้ตอบโจทย์ด้วย..."
+
+**จัดการข้อกังวล:**
+"สำหรับเรื่อง${formData.last_concern} ทางเรามีวิธีแก้โดย..."
+
+**ความเร่งด่วนเชิงพื้นที่:**
+${result.urgency}
+
+**เทคนิค Alternative Close:**
+${result.closes.join('\n\n')}
+
+**สร้างความมั่นใจ:**
+${result.confidenceBuilder}
+
+**ขั้นตอนถัดไป:**
+${result.nextStep}`;
+
+                    case "prompt_designer":
+                        result = DemoAnalysisEngine.designPrompt(formData, rhData, zone);
+                        return `### 🤖 Master Prompt Design (DEMO MODE)
+                        
+**1. วิเคราะห์ความตั้งใจ:**
+${result.intentAnalysis}
+
+**2. Master Prompt:**
+\`\`\`
+${result.masterPrompt}
+\`\`\`
+
+**3. เคล็ดลับการปรับจูน:**
+${result.tuningTips.map((tip, i) => `${i+1}. ${tip}`).join('\n')}
+
+**4. โครงสร้างผลลัพธ์ที่แนะนำ:**
+${result.outputFormat}
+
+**หมายเหตุสำหรับพื้นที่${zone}:**
+- ใช้คำหลัก: ${rhData.keywords ? rhData.keywords.slice(0, 2).join(', ') : 'คำหลักท้องถิ่น'}
+- อ้างอิง: ${rhData.hospitals ? rhData.hospitals[0] : 'โรงพยาบาลในพื้นที่'}
+- เน้น: ${rhData.dynamics ? rhData.dynamics.substring(0, 100) + '...' : 'บริบทท้องถิ่น'}`;
+
+                    default:
+                        return "### DEMO MODE\n\nไม่พบข้อมูลสำหรับหมวดหมู่นี้";
+                }
+            }
+            
+            async handleGenerate() {
+                this.setState({ loading: true, aiResponse: "", error: "" });
+                
+                // ใช้ Demo Mode เป็นหลัก (ตามที่ต้องการ)
+                setTimeout(() => {
+                    try {
+                        const demoResponse = this.generateDemoResponse();
+                        this.setState({ 
+                            aiResponse: demoResponse,
+                            loading: false,
+                            demoMode: true
+                        });
+                    } catch (error) {
+                        console.error("Demo mode error:", error);
+                        this.setState({ 
+                            error: "เกิดข้อผิดพลาดใน Demo Mode: " + error.message,
+                            loading: false 
+                        });
+                    }
+                }, 800); // เพิ่ม delay นิดหน่อยให้ดู realistic
+            }
+            
+            renderInputSection() {
+                const tab = this.state.activeTab;
+                const f = this.state.forms[tab];
+                
+                const createInput = (tabName, field, value, placeholder, type = "text", extraClass = "") => {
+                    const id = `${tabName}-${field}`;
+                    return `
+                        <input 
+                            id="${id}"
+                            type="${type}" 
+                            class="w-full p-3 border rounded-lg bg-slate-50 text-base ${extraClass}"
+                            value="${value}"
+                            oninput="app.handleInputChange('${tabName}', '${field}', this.value)"
+                            placeholder="${placeholder}"
+                            autocomplete="off"
+                        >
+                    `;
+                };
+                
+                const createTextarea = (tabName, field, value, placeholder, rows = 4) => {
+                    const id = `${tabName}-${field}`;
+                    return `
+                        <textarea 
+                            id="${id}"
+                            class="w-full p-3 border rounded-lg bg-slate-50 text-base resize-none"
+                            rows="${rows}"
+                            oninput="app.handleInputChange('${tabName}', '${field}', this.value)"
+                            placeholder="${placeholder}"
+                            autocomplete="off"
+                        >${value}</textarea>
+                    `;
+                };
+                
+                const createSelect = (tabName, field, value, options, placeholder = "เลือก") => {
+                    const id = `${tabName}-${field}`;
+                    let optionsHtml = `<option value="">${placeholder}</option>`;
+                    
+                    if (Array.isArray(options)) {
+                        options.forEach(option => {
+                            const isSelected = option === value ? 'selected' : '';
+                            optionsHtml += `<option value="${option}" ${isSelected}>${option}</option>`;
+                        });
+                    } else if (typeof options === 'object') {
+                        Object.entries(options).forEach(([key, label]) => {
+                            const isSelected = key === value ? 'selected' : '';
+                            optionsHtml += `<option value="${key}" ${isSelected}>${label}</option>`;
+                        });
+                    }
+                    
+                    return `
+                        <select 
+                            id="${id}"
+                            class="w-full p-3 border rounded-lg bg-slate-50 text-base"
+                            onchange="app.handleInputChange('${tabName}', '${field}', this.value)"
+                        >
+                            ${optionsHtml}
+                        </select>
+                    `;
+                };
+                
+                const InputWrap = (label, children) => `
+                    <div class="mb-4">
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">${label}</label>
+                        ${children}
+                    </div>
+                `;
+                
+                switch (tab) {
+                    case "needs_analysis":
+                        const { gap } = this.calculateRealityCheck();
+                        return `
+                            <div class="space-y-4 animate-in">
+                                <div class="grid grid-cols-2 gap-3">
+                                    ${InputWrap("รายได้ต่อปี (บาท)", 
+                                        createInput('needs_analysis', 'income', f.income, "0", "number")
+                                    )}
+                                    ${InputWrap("รายจ่าย/เดือน", 
+                                        createInput('needs_analysis', 'expense', f.expense, "0", "number")
+                                    )}
+                                </div>
+                                ${InputWrap("หนี้สินรวม (บ้าน/รถ/ธุรกิจ)", 
+                                    createInput('needs_analysis', 'debt', f.debt, "0", "number")
+                                )}
+                                <div class="grid grid-cols-2 gap-3">
+                                    ${InputWrap("คนในอุปการะ", 
+                                        createInput('needs_analysis', 'dependents', f.dependents, "คน", "number")
+                                    )}
+                                    ${InputWrap("จำนวนปีที่ต้องดูแล", 
+                                        createInput('needs_analysis', 'years', f.years, "ปี", "number")
+                                    )}
+                                </div>
+                                ${InputWrap("สินทรัพย์เดิม (เงินออม/ทุนประกัน)", 
+                                    createInput('needs_analysis', 'assets', f.assets, "0", "number")
+                                )}
+                                <div class="bg-gradient-to-r from-sky-900 to-indigo-900 rounded-xl p-4 text-white shadow-lg">
+                                    <div class="flex justify-between items-center text-[11px] opacity-80 mb-1">
+                                        <span>ESTIMATED PROTECTION GAP</span>
+                                        ${ICONS.alert}
+                                    </div>
+                                    <div id="protection-gap" class="text-xl font-bold">${gap.toLocaleString()} บาท</div>
+                                    <div class="text-[10px] opacity-60 mt-1">Demo Mode: วิเคราะห์จากข้อมูลจริง</div>
+                                </div>
+                            </div>
+                        `;
+                    
+                    case "ice_breaking":
+                        return `
+                            <div class="space-y-4 animate-in">
+                                <div class="grid grid-cols-2 gap-3">
+                                    ${InputWrap("ช่วงอายุลูกค้า", 
+                                        createInput('ice_breaking', 'age', f.age, "เช่น 35-40 ปี")
+                                    )}
+                                    ${InputWrap("อาชีพ", 
+                                        createInput('ice_breaking', 'job', f.job, "เช่น วิศวกร")
+                                    )}
+                                </div>
+                                ${InputWrap("สถานที่ที่พบกัน", 
+                                    createInput('ice_breaking', 'location', f.location, "เช่น ร้านกาแฟในนิคมฯ")
+                                )}
+                                ${InputWrap("สิ่งที่สังเกตเห็น (Insight)", 
+                                    createTextarea('ice_breaking', 'observation', f.observation, "เช่น ใส่สมาร์ทวอทช์, ดูรีบไปรับลูก, ถือหนังสือลงทุน", 4)
+                                )}
+                            </div>
+                        `;
+                    
+                    case "objection":
+                        const objectionOptions = {
+                            "เงินไม่พอ": "เงินไม่พอ",
+                            "มีประกันเยอะแล้ว": "มีประกันเยอะแล้ว",
+                            "ขอถามแฟน/ครอบครัวก่อน": "ขอถามแฟน/ครอบครัวก่อน",
+                            "ประกันโกง/เบิกยาก": "ประกันโกง/เบิกยาก",
+                            "ยังไม่รีบ/ยังแข็งแรง": "ยังไม่รีบ/ยังแข็งแรง"
+                        };
+                        
+                        return `
+                            <div class="space-y-4">
+                                ${InputWrap("ข้อโต้แย้งที่พบ", 
+                                    createSelect('objection', 'type', f.type, objectionOptions, "เลือกประเภทข้อโต้แย้ง")
+                                )}
+                                ${InputWrap("คำพูดดิบๆ ของลูกค้า (Direct Quote)", 
+                                    createTextarea('objection', 'direct_quote', f.direct_quote, "เช่น 'น้องคะ ช่วงนี้พี่ผ่อนบ้านเยอะ ไม่ไหวจริงๆ'", 5)
+                                )}
+                                <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                                    <strong>Demo Mode Tip:</strong> ระบบวิเคราะห์จากฐานข้อมูลเทคนิค LSCPA และตัวอย่างในพื้นที่
+                                </div>
+                            </div>
+                        `;
+                    
+                    case "simplifier":
+                        return `
+                            <div class="space-y-4">
+                                ${InputWrap("ชื่อแผนประกัน", 
+                                    createInput('simplifier', 'plan_name', f.plan_name, "เช่น ttb Easy Care")
+                                )}
+                                ${InputWrap("เบี้ยประกันต่อปี (บาท)", 
+                                    createInput('simplifier', 'premium', f.premium, "0", "number")
+                                )}
+                                ${InputWrap("ผลประโยชน์หลัก (ระบุ 3-5 ข้อ)", 
+                                    createTextarea('simplifier', 'benefits', f.benefits, "1. คุ้มครองผู้ป่วยใน...\\n2. เหมาจ่ายค่ารักษา...", 5)
+                                )}
+                            </div>
+                        `;
+                    
+                    case "matchmaker":
+                        const goalOptions = {
+                            "ลดหย่อนภาษี": "ลดหย่อนภาษี",
+                            "มรดกให้ลูกหลาน": "มรดกให้ลูกหลาน",
+                            "ค่ารักษาพยาบาล (สุขภาพ)": "ค่ารักษาพยาบาล (สุขภาพ)",
+                            "เงินออม/เกษียณ": "เงินออม/เกษียณ"
+                        };
+                        
+                        return `
+                            <div class="space-y-4">
+                                ${InputWrap("เป้าหมายหลัก", 
+                                    createSelect('matchmaker', 'goal', f.goal, goalOptions, "เลือกเป้าหมาย")
+                                )}
+                                ${InputWrap("งบประมาณที่ชำระได้สะดวก (ต่อปี)", 
+                                    createInput('matchmaker', 'budget', f.budget, "เช่น 30,000", "number")
+                                )}
+                                <div class="p-3 bg-gradient-to-r from-sky-50 to-indigo-50 rounded-xl border border-sky-100 flex items-start gap-3">
+                                    ${ICONS.zap}
+                                    <p class="text-xs text-sky-800 leading-relaxed">MAMA จะแนะนำแผนโดยอ้างอิงสวัสดิการพื้นฐานของคนในโซน <b>${this.state.userProfile.zone}</b> เป็นหลัก</p>
+                                </div>
+                            </div>
+                        `;
+                    
+                    case "closing":
+                        return `
+                            <div class="space-y-4">
+                                ${InputWrap("จุดที่ลูกค้าดูสนใจมากที่สุด", 
+                                    createInput('closing', 'interest_point', f.interest_point, "เช่น การคุ้มครองโรคร้ายแรง")
+                                )}
+                                ${InputWrap("ข้อกังวลสุดท้ายที่ลูกค้าลังเล", 
+                                    createTextarea('closing', 'last_concern', f.last_concern, "เช่น กลัวอนาคตส่งไม่ไหว", 5)
+                                )}
+                            </div>
+                        `;
+                    
+                    case "prompt_designer":
+                        const toneOptions = {
+                            "Professional": "Professional",
+                            "อบอุ่น/เป็นกันเอง": "อบอุ่น/เป็นกันเอง",
+                            "กระตุ้นให้ตระหนักถึงความเสี่ยง": "กระตุ้นให้ตระหนักถึงความเสี่ยง"
+                        };
+                        
+                        return `
+                            <div class="space-y-4">
+                                ${InputWrap("เป้าหมายของคำสั่ง (Objective)", 
+                                    createInput('prompt_designer', 'objective', f.objective, "เช่น เขียนโพสต์ Facebook ขายประกันสุขภาพ")
+                                )}
+                                ${InputWrap("กลุ่มเป้าหมาย (Target)", 
+                                    createInput('prompt_designer', 'target', f.target, "เช่น เจ้าของสวนยางในกระบี่")
+                                )}
+                                ${InputWrap("อารมณ์ที่ต้องการ", 
+                                    createSelect('prompt_designer', 'tone', f.tone, toneOptions, "เลือกอารมณ์")
+                                )}
+                                ${InputWrap("ข้อมูลเฉพาะที่ต้องใส่", 
+                                    createTextarea('prompt_designer', 'details', f.details, "ชื่อโรงพยาบาล, ชื่อแผนประกัน...", 4)
+                                )}
+                            </div>
+                        `;
+                    
+                    default:
+                        return `<div class="text-center text-slate-500 p-8">เลือกหมวดหมู่เพื่อเริ่มต้น</div>`;
+                }
+            }
+            
+            renderSetupPage() {
+                const rhOptions = Object.keys(RH_DATA).map(rh => 
+                    `<option value="${rh}">${rh}</option>`
+                ).join('');
+                
+                const zoneOptions = this.state.userProfile.rh 
+                    ? ZONES[this.state.userProfile.rh].map(z => 
+                        `<option value="${z}">${z}</option>`
+                      ).join('')
+                    : '';
+                
+                return `
+                    <div class="fixed-height bg-gradient-to-br from-slate-900 to-slate-950 flex items-center justify-center p-4 overflow-auto">
+                        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 md:p-8 overflow-hidden relative">
+                            <div class="absolute top-0 right-0 p-4 opacity-5">
+                                ${ICONS.sparkles.replace('icon-warning', '').replace('fa-sparkles', 'fa-star')}
+                            </div>
+                            
+                            <div class="flex flex-col items-center mb-6 relative">
+                                <div class="w-16 h-16 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white mb-4 shadow-xl">
+                                    ${ICONS.sparkles.replace('icon-warning', 'text-white')}
+                                </div>
+                                <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">MAMA V.2</h1>
+                                <p class="text-[10px] bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent font-bold tracking-[0.2em] uppercase mt-1">AI Sale Assistant</p>
+                                <div class="demo-badge mt-2">
+                                    ${ICONS.demoBadge} DEMO MODE
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">AGENT NAME</label>
+                                    <input type="text" 
+                                        id="agent-name-input"
+                                        value="${this.state.userProfile.agentName}" 
+                                        oninput="app.setState({ userProfile: { ...app.state.userProfile, agentName: this.value } })"
+                                        placeholder="ชื่อตัวแทน..." 
+                                        class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-sky-500 outline-none transition-all text-base">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">REGION (RH)</label>
+                                        <select 
+                                            id="rh-select"
+                                            value="${this.state.userProfile.rh}" 
+                                            onchange="app.setState({ userProfile: { ...app.state.userProfile, rh: this.value, zone: '' } })"
+                                            class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-sky-500 outline-none text-base">
+                                            <option value="">เลือก RH</option>
+                                            ${rhOptions}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">ZONE</label>
+                                        <select 
+                                            id="zone-select"
+                                            value="${this.state.userProfile.zone}" 
+                                            onchange="app.setState({ userProfile: { ...app.state.userProfile, zone: this.value } })"
+                                            ${!this.state.userProfile.rh ? 'disabled' : ''}
+                                            class="w-full border-2 border-slate-100 rounded-xl p-3 focus:border-sky-500 outline-none text-base ${!this.state.userProfile.rh ? 'bg-slate-50' : ''}">
+                                            <option value="">เลือกโซน</option>
+                                            ${zoneOptions}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        ${ICONS.demoBadge}
+                                        <span class="font-bold text-amber-800">DEMO MODE เปิดใช้งาน</span>
+                                    </div>
+                                    <p class="text-xs text-amber-700">
+                                        ระบบวิเคราะห์ด้วยกฎและเงื่อนไขในตัวระบบ โดยไม่ต้องใช้ API Key
+                                    </p>
+                                </div>
+                                
+                                <button 
+                                    onclick="if(app.state.userProfile.agentName && app.state.userProfile.zone) app.setState({ isSetup: true }); else alert('กรุณากรอกชื่อตัวแทนและเลือกโซนให้ครบ')"
+                                    class="w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl transition-all mt-2 flex items-center justify-center gap-2 shadow-lg shadow-sky-900/20 active:scale-95 transform transition-transform">
+                                    Start Demo ${ICONS.chevronRight}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderMainPage() {
+                const tabs = [
+                    { id: 'needs_analysis', label: '1. วิเคราะห์ความต้องการ', icon: ICONS.calculator },
+                    { id: 'ice_breaking', label: '2. บทสนทนาเปิดใจ', icon: ICONS.message },
+                    { id: 'objection', label: '3. ทลายข้อโต้แย้ง', icon: ICONS.shield },
+                    { id: 'simplifier', label: '4. ย่อยผลประโยชน์', icon: ICONS.gift },
+                    { id: 'matchmaker', label: '5. เลือกผลิตภัณฑ์', icon: ICONS.bag },
+                    { id: 'closing', label: '6. สรุปและปิดการขาย', icon: ICONS.file },
+                    { id: 'prompt_designer', label: '7. Prompt Designer', icon: ICONS.terminal },
+                ];
+                
+                const rh = RH_DATA[this.state.userProfile.rh] || {};
+                const zone = this.state.userProfile.zone;
+                
+                return `
+                    <div class="fixed-height flex flex-col md:flex-row overflow-hidden">
+                        <!-- Sidebar -->
+                        <aside class="w-full md:w-72 bg-gradient-to-b from-slate-900 to-slate-950 text-white flex flex-col flex-shrink-0 z-30 shadow-2xl">
+                            <div class="p-4 md:p-6 border-b border-white/5 flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center text-white">
+                                    ${ICONS.sparkles.replace('icon-warning', 'text-white')}
+                                </div>
+                                <div>
+                                    <span class="font-black text-xl block leading-none">MAMA <span class="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">V.2</span></span>
+                                    <span class="text-[8px] text-slate-500 font-bold tracking-[0.2em]">PRU ACADEMY [ttb]</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 overflow-y-auto p-3 md:p-4 space-y-1.5 custom-scrollbar">
+                                ${tabs.map(tab => `
+                                    <button
+                                        onclick="app.setState({ activeTab: '${tab.id}', aiResponse: '' })"
+                                        class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all group ${this.state.activeTab === tab.id ? 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:bg-white/5 hover:text-white'}">
+                                        ${tab.icon}
+                                        <span class="text-[13px] font-bold">${tab.label}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="p-4 bg-black/20 border-t border-white/5">
+                                <div class="bg-slate-800/50 rounded-2xl p-4 relative overflow-hidden">
+                                    <div class="text-[10px] text-slate-500 font-bold mb-2 flex items-center gap-1 uppercase">
+                                        ${ICONS.map} ${zone}
+                                    </div>
+                                    <div class="text-xs font-bold mb-1 truncate">${rh.name || 'กรุณาเลือกภูมิภาค'}</div>
+                                    <div class="text-[10px] text-slate-400 italic">"${rh.tone || 'เลือกภูมิภาคเพื่อดูรายละเอียด'}"</div>
+                                    <div class="mt-2 text-[9px] bg-gradient-to-r from-amber-900 to-orange-900 text-amber-200 px-2 py-1 rounded-full inline-flex items-center gap-1">
+                                        ${ICONS.demoBadge} DEMO MODE
+                                    </div>
+                                    <button onclick="app.setState({ isSetup: false })" class="absolute top-2 right-2 text-slate-600 hover:text-sky-400">
+                                        ${ICONS.rotate}
+                                    </button>
+                                </div>
+                            </div>
+                        </aside>
+                        
+                        <!-- Main Content -->
+                        <main class="flex-1 flex flex-col overflow-hidden relative">
+                            <!-- Header -->
+                            <header class="bg-white px-4 md:px-8 py-4 md:py-5 border-b flex justify-between items-center z-10">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3">
+                                        <h2 class="text-lg md:text-xl font-black text-slate-800">
+                                            ${this.state.activeTab.replace('_', ' ').toUpperCase()}
+                                        </h2>
+                                        <div class="demo-badge text-xs">
+                                            ${ICONS.demoBadge} DEMO
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2 mt-1">
+                                        ${rh.keywords ? rh.keywords.slice(0, 2).map(k => `
+                                            <span class="text-[9px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">#${k}</span>
+                                        `).join('') : ''}
+                                    </div>
+                                </div>
+                                <button 
+                                    onclick="app.handleGenerate()"
+                                    ${this.state.loading ? 'disabled' : ''}
+                                    class="px-4 md:px-8 py-2 md:py-3 rounded-xl font-black transition-all flex items-center gap-2 shadow-xl ${this.state.loading ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-gradient-to-r from-sky-600 to-indigo-600 text-white hover:from-sky-700 hover:to-indigo-700 shadow-sky-900/10 active:scale-95 transform transition-transform'}"
+                                    style="min-width: 140px;">
+                                    ${this.state.loading ? 
+                                        '<i class="fas fa-spinner fa-spin"></i>' : 
+                                        ICONS.sparkles.replace('icon-warning', 'text-white')}
+                                    <span class="hidden md:inline">${this.state.loading ? 'วิเคราะห์...' : 'วิเคราะห์ (Demo)'}</span>
+                                    <span class="md:hidden">${this.state.loading ? '...' : 'วิเคราะห์'}</span>
+                                </button>
+                            </header>
+                            
+                            <div class="flex-1 flex overflow-hidden">
+                                <!-- Left: Input Panel -->
+                                <div class="w-full md:w-80 bg-white border-r overflow-y-auto p-4 md:p-6 flex-shrink-0 custom-scrollbar">
+                                    <div class="mb-6 flex items-center justify-between">
+                                        <h4 class="text-[11px] font-black text-slate-500 uppercase tracking-widest">Client Inputs</h4>
+                                        ${ICONS.trending}
+                                    </div>
+                                    <div id="input-section">
+                                        ${this.renderInputSection()}
+                                    </div>
+                                    
+                                    <!-- Region Insights -->
+                                    <div class="mt-8 pt-8 border-t space-y-4">
+                                        <div class="flex items-center gap-2 bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">
+                                            ${ICONS.building}
+                                            <span class="text-[11px] font-black uppercase tracking-wider">Local Insight</span>
+                                        </div>
+                                        <div class="p-4 bg-slate-50 rounded-2xl border">
+                                            <p class="text-sm text-slate-600 leading-relaxed italic">"${rh.dynamics || 'กรุณาเลือกภูมิภาค'}"</p>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                                                ${ICONS.stethoscope}
+                                                <span class="text-[11px] font-black uppercase tracking-wider">Top Hospitals</span>
+                                            </div>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                ${rh.hospitals ? rh.hospitals.map(h => `
+                                                    <span class="text-[10px] bg-white border px-2 py-1 rounded-lg text-slate-500 font-bold">${h}</span>
+                                                `).join('') : '<span class="text-[10px] text-slate-400">กรุณาเลือกภูมิภาค</span>'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right: Output Panel -->
+                                <div class="flex-1 bg-gradient-to-br from-slate-50 to-white overflow-y-auto custom-scrollbar relative">
+                                    ${this.renderOutputPanel()}
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                `;
+            }
+            
+            renderOutputPanel() {
+                if (!this.state.aiResponse) {
+                    return `
+                        <div class="h-full flex flex-col items-center justify-center opacity-20 select-none px-6 md:px-12 text-center py-12">
+                            <div class="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-slate-200 to-slate-300 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                                ${ICONS.sparkles.replace('icon-warning', 'text-slate-400')}
+                            </div>
+                            <h3 class="text-xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-slate-400 to-slate-600 bg-clip-text text-transparent">MAMA DEMO READY</h3>
+                            <p class="mt-2 text-slate-500 max-w-sm text-sm md:text-base">
+                                กรอกข้อมูลในช่อง Input ทางซ้าย แล้วกด "วิเคราะห์ (Demo)"<br>
+                                <span class="text-xs text-amber-600 font-bold mt-2 inline-block">ระบบวิเคราะห์ด้วยกฎและเงื่อนไขในตัว</span>
+                            </p>
+                            ${this.state.error ? `
+                                <div class="mt-8 p-4 bg-red-50 text-red-600 border border-red-200 rounded-2xl text-xs font-bold w-full max-w-md">
+                                    ${this.state.error}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }
+                
+                // แปลงรูปแบบ markdown เป็น HTML อย่างง่าย
+                const formatResponse = (text) => {
+                    return text
+                        .replace(/\n\n/g, '<br><br>')
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-900">$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/### (.*?)(<br>|$)/g, '<h3 class="text-lg font-black text-slate-900 mt-6 mb-3 flex items-center gap-2 border-l-4 border-sky-500 pl-4">$1</h3>')
+                        .replace(/- (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 flex items-start"><span class="text-sky-500 mr-2">•</span> $1</li>')
+                        .replace(/`(.*?)`/g, '<code class="bg-slate-100 text-slate-700 px-2 py-1 rounded font-mono text-sm">$1</code>')
+                        .replace(/\+\+ (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 flex items-start"><span class="text-emerald-500 mr-2">+</span> $1</li>')
+                        .replace(/✅ (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 flex items-start"><span class="text-emerald-500 mr-2">✓</span> $1</li>')
+                        .replace(/❌ (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 flex items-start"><span class="text-red-500 mr-2">✗</span> $1</li>');
+                };
+                
+                return `
+                    <div class="max-w-3xl mx-auto p-4 md:p-8 lg:p-12 pb-20 md:pb-32 slide-in-from-bottom">
+                        <!-- Demo Mode Badge -->
+                        <div class="mb-6 flex justify-center">
+                            <div class="demo-badge text-sm">
+                                ${ICONS.demoBadge} DEMO MODE ANALYSIS
+                            </div>
+                        </div>
+                        
+                        <!-- Result Wrapper -->
+                        <div class="bg-white rounded-2xl md:rounded-[2rem] shadow-2xl shadow-slate-200 overflow-hidden border border-white">
+                            <!-- Result Header -->
+                            <div class="bg-gradient-to-r from-sky-600 to-indigo-600 px-6 md:px-10 py-4 md:py-6 text-white flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                                        ${ICONS.lightbulb.replace('icon-warning', 'text-white')}
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.2em]">ANALYSIS RESULT</div>
+                                        <div class="text-sm font-bold opacity-90">${this.state.activeTab.replace('_', ' ').toUpperCase()}</div>
+                                    </div>
+                                </div>
+                                <button onclick="navigator.clipboard.writeText('${this.state.aiResponse.replace(/'/g, "\\'")}'); alert('คัดลอกลง Clipboard แล้ว');" class="w-8 h-8 md:w-10 md:h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-colors backdrop-blur-sm">
+                                    ${ICONS.copy.replace('icon-gray', 'text-white')}
+                                </button>
+                            </div>
+                            
+                            <!-- Result Content -->
+                            <div class="p-6 md:p-10 text-slate-700 leading-relaxed text-sm md:text-base overflow-wrap-break">
+                                ${formatResponse(this.state.aiResponse)}
+                                
+                                <!-- Demo Mode Disclaimer -->
+                                <div class="mt-8 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        ${ICONS.demoBadge}
+                                        <span class="font-bold text-amber-800">หมายเหตุ Demo Mode</span>
+                                    </div>
+                                    <p class="text-xs text-amber-700">
+                                        ผลการวิเคราะห์นี้สร้างจากกฎและเงื่อนไขที่กำหนดไว้ในระบบ โดยอ้างอิงข้อมูลพื้นที่ ${this.state.userProfile.zone} และฐานข้อมูลผลิตภัณฑ์ประกัน
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Rating -->
+                            <div class="bg-slate-50 p-4 md:p-6 border-t flex justify-center items-center gap-4 md:gap-6">
+                                <span class="text-[11px] font-black text-slate-500 uppercase tracking-widest">ผลการวิเคราะห์มีประโยชน์ไหม?</span>
+                                <div class="flex gap-4">
+                                    <button onclick="app.setState({ feedback: 'up' })" class="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center border transition-all ${this.state.feedback === 'up' ? 'bg-gradient-to-br from-emerald-500 to-green-500 text-white border-emerald-500' : 'bg-white text-slate-300 hover:text-emerald-500'}">
+                                        ${ICONS.thumbsUp}
+                                    </button>
+                                    <button onclick="app.setState({ feedback: 'down' })" class="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center border transition-all ${this.state.feedback === 'down' ? 'bg-gradient-to-br from-rose-500 to-pink-500 text-white border-rose-500' : 'bg-white text-slate-300 hover:text-rose-500'}">
+                                        ${ICONS.thumbsDown}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer Buttons -->
+                        <div class="mt-6 md:mt-8 flex flex-wrap justify-center gap-3">
+                            <button class="bg-white border text-slate-600 px-4 md:px-6 py-2 md:py-3 rounded-xl text-xs font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm">
+                                ${ICONS.share} <span class="hidden md:inline">ส่งเข้า Line</span>
+                            </button>
+                            <button class="bg-white border text-slate-600 px-4 md:px-6 py-2 md:py-3 rounded-xl text-xs font-bold hover:bg-slate-50 flex items-center gap-2 shadow-sm">
+                                ${ICONS.save} <span class="hidden md:inline">บันทึกเคส</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            render() {
+                const root = document.getElementById('root');
+                if (!root) {
+                    console.error("Root element not found!");
+                    return;
+                }
+                
+                try {
+                    const html = this.state.isSetup ? this.renderMainPage() : this.renderSetupPage();
+                    root.innerHTML = html;
+                    
+                    // Restore input values และเก็บ references
+                    this.restoreInputValues();
+                    
+                    console.log("Render successful!");
+                } catch (error) {
+                    console.error("Render error:", error);
+                    root.innerHTML = `
+                        <div class="fixed-height flex items-center justify-center bg-red-50">
+                            <div class="bg-white p-8 rounded-2xl shadow-lg max-w-md">
+                                <h1 class="text-2xl font-bold text-red-600 mb-4">เกิดข้อผิดพลาด</h1>
+                                <p class="text-slate-600 mb-4">ระบบไม่สามารถแสดงผลได้ กรุณารีเฟรชหน้าเว็บ</p>
+                                <button onclick="location.reload()" class="w-full bg-sky-600 text-white py-3 rounded-lg font-bold">
+                                    รีเฟรชหน้าเว็บ
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            restoreInputValues() {
+                this.inputElements = {};
+                
+                for (const tab in this.state.forms) {
+                    for (const field in this.state.forms[tab]) {
+                        const id = `${tab}-${field}`;
+                        const element = document.getElementById(id);
+                        if (element) {
+                            element.value = this.state.forms[tab][field];
+                            this.inputElements[id] = element;
+                        }
+                    }
+                }
+            }
+            
+            init() {
+                // ตั้งค่า state เริ่มต้นจาก localStorage
+                try {
+                    const savedState = localStorage.getItem('mama_state');
+                    if (savedState) {
+                        const parsed = JSON.parse(savedState);
+                        this.setState({ ...parsed, demoMode: true });
+                    }
+                } catch (e) {
+                    console.log("No saved state found");
+                }
+                
+                // บันทึก state ลง localStorage เมื่อเปลี่ยนแปลง
+                const originalSetState = this.setState.bind(this);
+                this.setState = (newState) => {
+                    originalSetState(newState);
+                    try {
+                        localStorage.setItem('mama_state', JSON.stringify({
+                            ...this.state,
+                            apiKey: "", // ไม่ save apiKey
+                            demoMode: true
+                        }));
+                    } catch (e) {
+                        console.log("Could not save state to localStorage");
+                    }
+                };
+                
+                this.render();
+            }
+        }
+
+        // เริ่มต้นแอปพลิเคชัน
+        document.addEventListener('DOMContentLoaded', function() {
+            window.app = new MAMAV2();
+            console.log("MAMA V.2 Demo Mode App loaded successfully!");
+        });
     </script>
 </body>
 </html>
-
